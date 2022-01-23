@@ -15,6 +15,6 @@ void D1DvmFile_free(
     D1DvmFile* file
 );
 
-D1Map* D1DvmFile_map(
-    const D1DvmFile* file
+D1Map* D1DvmFile_stealMap(
+    D1DvmFile* file
 );

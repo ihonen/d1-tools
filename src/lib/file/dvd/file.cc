@@ -98,9 +98,11 @@ void D1DvdFile_free(
     delete file;
 }
 
-D1Minimap* D1DvdFile_minimap(
+D1Minimap* D1DvdFile_stealMinimap(
     D1DvdFile* file
 )
 {
-    return file->minimap;
+    auto minimap = file->minimap;
+    file->minimap = nullptr;
+    return minimap;
 }

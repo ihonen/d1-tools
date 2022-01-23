@@ -15,6 +15,6 @@ void D1DvdFile_free(
     D1DvdFile* file
 );
 
-D1Minimap* D1DvdFile_minimap(
+D1Minimap* D1DvdFile_stealMinimap(
     D1DvdFile* file
 );

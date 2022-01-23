@@ -39,10 +39,12 @@ D1Level* D1Level_newFromDvdFile(
     auto dvmFile = D1DvmFile_newFromFile(dvmPath.string().c_str());
 
     auto level = new D1Level;
-
     level->name = dvdPath.stem().string();
-    level->map = D1DvmFile_map(dvmFile);
-    level->minimap = D1DvdFile_minimap(dvdFile);
+    level->map = D1DvmFile_stealMap(dvmFile);
+    level->minimap = D1DvdFile_stealMinimap(dvdFile);
+
+    D1DvdFile_free(dvdFile);
+    D1DvmFile_free(dvmFile);
 
     return level;
 }
@@ -69,7 +71,6 @@ D1Map* D1Level_map(
 {
     return level->map;
 }
-
 
 D1Minimap* D1Level_minimap(
     D1Level* level

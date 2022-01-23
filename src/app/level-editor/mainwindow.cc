@@ -70,6 +70,7 @@ void MainWindow::onOpenAction(
         if (m_openLevel != nullptr)
         {
             D1Level_free(m_openLevel);
+            m_openLevel = nullptr;
         }
 
         m_openLevel = D1Level_newFromDvdFile(filepath.toStdString().c_str());

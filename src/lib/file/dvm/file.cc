@@ -15,7 +15,7 @@ extern "C" {
 
 struct D1DvmFile
 {
-    D1Map* map;
+    D1Map* map = nullptr;
 };
 
 // -----------------------------------------------------------------------------
@@ -93,12 +93,15 @@ void D1DvmFile_free(
     D1DvmFile* file
 )
 {
+    D1Map_free(file->map);
     delete file;
 }
 
-D1Map* D1DvmFile_map(
-    const D1DvmFile* file
+D1Map* D1DvmFile_stealMap(
+    D1DvmFile* file
 )
 {
-    return file->map;
+    auto map = file->map;
+    file->map = nullptr;
+    return map;
 }
