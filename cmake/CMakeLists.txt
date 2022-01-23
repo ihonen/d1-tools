@@ -13,9 +13,18 @@ endif ()
 
 set(D1_INCLUDE_DIRECTORIES
     ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/lib/bzip2
+    ${CMAKE_SOURCE_DIR}/lib/mio/single_include
     ${CMAKE_SOURCE_DIR}/src
 )
 
 # ------------------------------------------------------------------------------
 
+include(qtpath.cmake)
+
+# ------------------------------------------------------------------------------
+
 add_subdirectory(app)
+add_subdirectory(lib)
+
+# ------------------------------------------------------------------------------

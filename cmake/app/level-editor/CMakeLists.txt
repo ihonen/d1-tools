@@ -10,6 +10,7 @@ set(CMAKE_AUTOUIC ON)
 add_executable(d1-level-editor
     ${CMAKE_SOURCE_DIR}/src/app/level-editor/main.cc
     ${CMAKE_SOURCE_DIR}/src/app/level-editor/mainwindow.cc
+    ${CMAKE_SOURCE_DIR}/src/app/level-editor/mapview.cc
 )
 target_include_directories(d1-level-editor
     PRIVATE ${D1_INCLUDE_DIRECTORIES}
@@ -19,10 +20,15 @@ target_compile_options(d1-level-editor
 )
 target_link_libraries(d1-level-editor
     PRIVATE Qt5::Widgets
+    PRIVATE bz2_static
+    PRIVATE mio
+    PRIVATE d1-common
+    PRIVATE d1-image
+    PRIVATE d1-level
 )
+# TODO: This only works with Visual Studio (the output path is different if
+# building manually on the command line).
 add_custom_command(
     TARGET d1-level-editor POST_BUILD
-    COMMAND $ENV{CMAKE_PREFIX_PATH}/bin/windeployqt.exe ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/d1-level-editor.exe
+    COMMAND ${Qt5_DIR}/bin/windeployqt.exe ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/d1-level-editor.exe
 )
-
-message("$ENV{CMAKE_PREFIX_PATH}\\bin\\windeployqt.exe")
