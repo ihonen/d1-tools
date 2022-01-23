@@ -1,4 +1,5 @@
 extern "C" {
+#include "lib/file/dvd/bgnd.h"
 #include "lib/file/dvd/file.h"
 #include "lib/file/dvd/sector.h"
 #include "lib/level/map.h"
@@ -67,7 +68,7 @@ D1DvdFile* D1DvdFile_newFromFile(
         {
         case D1DvdSectorBgnd:
             Log::debug() << "Loading " << file->levelName << " sector BGND\n" << std::flush;
-            file->minimap = D1Minimap_newFromBgndSector(
+            file->minimap = d1_parseDvdBgndSectorData(
                 sectorData,
                 sectorHeader->sectorDataSize
             );

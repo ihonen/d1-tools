@@ -9,9 +9,10 @@
 
 // -----------------------------------------------------------------------------
 
-D1Minimap* D1Minimap_newFromBgndSector(
-    const uint8_t* sectorDataBegin,
-    uint32_t sectorDataSize
+D1Minimap* D1Minimap_new(
+    uint16_t width,
+    uint16_t height,
+    const Bgr888* pixels
 );
 
 void D1Minimap_free(

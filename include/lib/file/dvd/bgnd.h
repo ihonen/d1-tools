@@ -8,6 +8,7 @@ typedef struct D1Minimap D1Minimap;
 
 // ---------------------------------------------------------------------------
 
-D1Minimap* d1_parseBgndSectorData(
-    const uint8_t* first_byte
+D1Minimap* d1_parseDvdBgndSectorData(
+    const uint8_t* firstByteOfData,
+    uint32_t dataSize
 );
