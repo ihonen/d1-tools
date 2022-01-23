@@ -11,6 +11,7 @@ add_executable(d1-level-editor
     ${CMAKE_SOURCE_DIR}/src/app/level-editor/main.cc
     ${CMAKE_SOURCE_DIR}/src/app/level-editor/mainwindow.cc
     ${CMAKE_SOURCE_DIR}/src/app/level-editor/mapview.cc
+    ${CMAKE_SOURCE_DIR}/src/app/level-editor/propertyview.cc
 )
 target_include_directories(d1-level-editor
     PRIVATE ${D1_INCLUDE_DIRECTORIES}

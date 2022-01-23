@@ -2,11 +2,13 @@ extern "C" {
 #include "lib/level/level.h"
 }
 
-#include "app/level-editor/mapview.hh"
 #include "app/level-editor/mainwindow.hh"
+#include "app/level-editor/mapview.hh"
+#include "app/level-editor/propertyview.hh"
 #include "lib/common/log.hh"
 
 #include <QAction>
+#include <QDockWidget>
 #include <QFileDialog>
 #include <QMenu>
 #include <QMenuBar>
@@ -32,6 +34,12 @@ MainWindow::MainWindow(
 
     m_mapView = new MapView(this);
     setCentralWidget(m_mapView);
+
+    m_dock = new QDockWidget(tr("Properties"), this);
+    m_dock->setAllowedAreas(Qt::RightDockWidgetArea);
+    m_propertyView = new PropertyView(m_dock);
+    m_dock->setWidget(m_propertyView);
+    addDockWidget(Qt::RightDockWidgetArea, m_dock);
 
     connect(
         m_openAction,

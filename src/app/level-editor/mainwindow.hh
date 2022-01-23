@@ -31,7 +31,9 @@ namespace d1::level_editor
         QMenu* m_fileMenu = nullptr;
         QAction* m_openAction = nullptr;
 
+        QDockWidget* m_dock = nullptr;
         MapView* m_mapView = nullptr;
+        PropertyView* m_propertyView = nullptr;
         
         D1Level* m_openLevel = nullptr;
     };
