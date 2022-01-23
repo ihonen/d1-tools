@@ -1,5 +1,6 @@
 extern "C" {
 #include "lib/file/dvd/file.h"
+#include "lib/file/dvm/file.h"
 #include "lib/level/map.h"
 #include "lib/level/minimap.h"
 #include "lib/level/level.h"
@@ -30,21 +31,19 @@ D1Level* D1Level_newFromDvdFile(
     const char* path
 )
 {
-    auto file = D1DvdFile_newFromFile(path);
+    auto dvdPath = std::filesystem::path(path);
+    auto dvmPath = dvdPath;
+    dvmPath.replace_extension(".dvm");
+
+    auto dvdFile = D1DvdFile_newFromFile(dvdPath.string().c_str());
+    auto dvmFile = D1DvmFile_newFromFile(dvmPath.string().c_str());
 
     auto level = new D1Level;
 
-    level->name = std::filesystem::path(path).stem().string();
-    level->minimap = D1DvdFile_minimap(file);
+    level->name = dvdPath.stem().string();
+    level->map = D1DvmFile_map(dvmFile);
+    level->minimap = D1DvdFile_minimap(dvdFile);
 
-    std::filesystem::path dvdFile(path);
-    auto dvmFile = dvdFile;
-    dvmFile.replace_extension(".dvm");
-
-    level->map = D1Map_newFromDvmFile(
-        dvmFile.string().c_str()
-    );
-     
     return level;
 }
 

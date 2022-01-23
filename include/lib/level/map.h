@@ -9,8 +9,10 @@
 
 // -----------------------------------------------------------------------------
 
-D1Map* D1Map_newFromDvmFile(
-    const char* path
+D1Map* D1Map_new(
+    uint16_t width,
+    uint16_t height,
+    const Bgr888* pixels
 );
 
 void D1Map_free(
