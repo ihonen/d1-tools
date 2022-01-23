@@ -24,6 +24,7 @@ target_link_libraries(d1-level-editor
     PRIVATE bz2_static
     PRIVATE mio
     PRIVATE d1-common
+    PRIVATE d1-file
     PRIVATE d1-image
     PRIVATE d1-level
 )

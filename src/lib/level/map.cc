@@ -18,8 +18,6 @@ namespace {
 
 struct D1Map
 {
-    D1Level* parentLevel = nullptr;
-
     uint32_t version         = 0;
     uint16_t filenameLen     = 0;
     std::string fileName     = "";
@@ -34,8 +32,7 @@ struct D1Map
 // -----------------------------------------------------------------------------
 
 D1Map* D1Map_newFromDvmFile(
-    const char* path,
-    D1Level* parentLevel
+    const char* path
 )
 {
     mio::mmap_source memmap;
@@ -54,8 +51,6 @@ D1Map* D1Map_newFromDvmFile(
 
     auto map = new D1Map;
 
-    map->parentLevel = parentLevel;
-
     map->width = *reinterpret_cast<const uint16_t*>(currentByte);
     currentByte += sizeof(uint16_t);
 
@@ -72,8 +67,6 @@ D1Map* D1Map_newFromDvmFile(
 
     unsigned decompressedDataSize = numPixels * sizeof(Bgr565);
     auto bgr565Pixels = new Bgr565[numPixels];
-
-    Log::debug() << "Decompressing " << D1Level_name(parentLevel) << " map\n" << std::flush;
 
     bzip2Decompress(
         bgr565Pixels,
@@ -109,13 +102,6 @@ void D1Map_free(
 )
 {
     delete map;
-}
-
-D1Level* D1Map_parentLevel(
-    const D1Map* map
-)
-{
-    return map->parentLevel;
 }
 
 const Bgr888* D1Map_pixels(

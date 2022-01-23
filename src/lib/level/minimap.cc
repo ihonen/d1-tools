@@ -13,8 +13,6 @@ extern "C" {
 
 struct D1Minimap
 {
-    D1Level* parentLevel = nullptr;
-
     uint32_t version         = 0;
     uint16_t filenameLen     = 0;
     std::string fileName     = "";
@@ -30,13 +28,10 @@ struct D1Minimap
 
 D1Minimap* D1Minimap_newFromBgndSector(
     const uint8_t* sectorDataBegin,
-    uint32_t /*sectorDataSize*/,
-    D1Level* parentLevel
+    uint32_t /*sectorDataSize*/
 )
 {
     auto minimap = new D1Minimap;
-
-    minimap->parentLevel = parentLevel;
     
     auto currentByte = sectorDataBegin;
 
@@ -68,8 +63,6 @@ D1Minimap* D1Minimap_newFromBgndSector(
 
     unsigned decompressedDataSize = numPixels * sizeof(Bgr565);
     auto bgr565Pixels = new Bgr565[numPixels];
-
-    Log::debug() << "Decompressing " << D1Level_name(parentLevel) << " minimap\n" << std::flush;
 
     bzip2Decompress(
         bgr565Pixels,
@@ -105,13 +98,6 @@ void D1Minimap_free(
 )
 {
     delete minimap;
-}
-
-D1Level* D1Minimap_parentLevel(
-    const D1Minimap* minimap
-)
-{
-    return minimap->parentLevel;
 }
 
 const Bgr888* D1Minimap_pixels(

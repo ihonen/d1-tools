@@ -11,16 +11,11 @@
 
 D1Minimap* D1Minimap_newFromBgndSector(
     const uint8_t* sectorDataBegin,
-    uint32_t sectorDataSize,
-    D1Level* parentLevel
+    uint32_t sectorDataSize
 );
 
 void D1Minimap_free(
     D1Minimap* minimap
-);
-
-D1Level* D1Minimap_parentLevel(
-    const D1Minimap* minimap
 );
 
 const Bgr888* D1Minimap_pixels(

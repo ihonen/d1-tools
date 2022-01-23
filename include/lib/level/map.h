@@ -10,16 +10,11 @@
 // -----------------------------------------------------------------------------
 
 D1Map* D1Map_newFromDvmFile(
-    const char* path,
-    D1Level* parentLevel
+    const char* path
 );
 
 void D1Map_free(
     D1Map* map
-);
-
-D1Level* D1Map_parentLevel(
-    const D1Map* map
 );
 
 const Bgr888* D1Map_pixels(
