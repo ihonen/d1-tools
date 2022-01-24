@@ -1,11 +1,8 @@
-extern "C" {
-#include "level/level.h"
-}
-
 #include "app/mainwindow.hh"
 #include "app/mapview.hh"
 #include "app/propertyview.hh"
 #include "common/log.hh"
+#include "level/level.hh"
 
 #include <QAction>
 #include <QDockWidget>
@@ -19,12 +16,7 @@ extern "C" {
 
 // -----------------------------------------------------------------------------
 
-using d1::level_editor::MainWindow;
-
-// -----------------------------------------------------------------------------
-
-MainWindow::MainWindow(
-)
+MainWindow::MainWindow()
     : QMainWindow(nullptr)
 {
     m_fileMenu = new QMenu("File", this);
@@ -49,8 +41,7 @@ MainWindow::MainWindow(
     );
 }
 
-void MainWindow::onOpenAction(
-)
+void MainWindow::onOpenAction()
 {
     QSettings settings;
     auto lastOpenedDvdFile = std::filesystem::path(
@@ -67,15 +58,9 @@ void MainWindow::onOpenAction(
 
     if (filepath.length() > 0)
     {
-        if (m_openLevel != nullptr)
-        {
-            D1Level_free(m_openLevel);
-            m_openLevel = nullptr;
-        }
-
-        m_openLevel = D1Level_newFromDvdFile(filepath.toStdString().c_str());
+        m_openLevel = std::make_shared<Level>(filepath.toStdString().c_str());
         m_mapView->setLevel(m_openLevel);
-        setWindowTitle(QString("D1 Level Editor — ") + D1Level_name(m_openLevel));
+        setWindowTitle(QString("D1 Level Editor — ") + QString::fromStdString(m_openLevel->name()));
         settings.setValue("LastOpenedDvdFile", filepath);
     }
 }

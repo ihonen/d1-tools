@@ -1,34 +1,27 @@
+#pragma once
+
 #include <QGraphicsView>
 
 // -----------------------------------------------------------------------------
 
-#include "level/fwd.h"
+class Level;
 
 class QGraphicsScene;
 
 // -----------------------------------------------------------------------------
 
-namespace d1::level_editor
+class MapView
+    : public QGraphicsView
 {
+    Q_OBJECT
+public:
 
-    class MapView
-        : public QGraphicsView
-    {
-        Q_OBJECT
-    public:
+    MapView(QWidget* parent = nullptr);
 
-        MapView(
-            QWidget* parent = nullptr
-        );
+    void setLevel(const std::shared_ptr<Level>& level);
 
-        void setLevel(
-            D1Level* level
-        );
+private:
 
-    private:
-
-        QGraphicsScene* m_scene = nullptr;
-        D1Level*        m_level = nullptr;
-    };
-
-}
+    QGraphicsScene* m_scene = nullptr;
+    std::shared_ptr<Level> m_level = nullptr;
+};

@@ -14,9 +14,7 @@ namespace
 
 // -----------------------------------------------------------------------------
 
-LogLevel verbosityToLogLevel(
-    unsigned verbosity
-)
+LogLevel verbosityToLogLevel(unsigned verbosity)
 {
     switch (verbosity)
     {
@@ -31,9 +29,7 @@ LogLevel verbosityToLogLevel(
     return LogLevel::Trace;
 }
 
-unsigned logLevelToVerbosity(
-    LogLevel level
-)
+unsigned logLevelToVerbosity(LogLevel level)
 {
     switch (level)
     {
@@ -63,43 +59,33 @@ LogBuffer::LogBuffer(
 {
 }
 
-LogBuffer::~LogBuffer(
-)
+LogBuffer::~LogBuffer()
 {
     std::cout << std::flush;
     m_logFile << std::flush;
 }
 
-void LogBuffer::setFile(
-    const std::filesystem::path& logFile
-)
+void LogBuffer::setFile(const std::filesystem::path& logFile)
 {
     m_logFile = std::ofstream(logFile);
 }
 
-void LogBuffer::setStdoutEnabled(
-    bool stdoutEnabled
-)
+void LogBuffer::setStdoutEnabled(bool stdoutEnabled)
 {
     m_stdoutEnabled = stdoutEnabled;
 }
 
-void LogBuffer::setActiveLevel(
-    LogLevel level
-)
+void LogBuffer::setActiveLevel(LogLevel level)
 {
     m_activeLevel = level;
 }
 
-void LogBuffer::setThresholdLevel(
-    LogLevel level
-)
+void LogBuffer::setThresholdLevel(LogLevel level)
 {
     m_thresholdLevel = level;
 }
 
-int LogBuffer::sync(
-)
+int LogBuffer::sync()
 {
     if (str().empty())
     {
@@ -140,83 +126,68 @@ int LogBuffer::sync(
 
 // -----------------------------------------------------------------------------
 
-Log& Log::get(
-)
+Log& Log::get()
 {
     static Log instance;
     return instance;
 }
 
-void Log::setActiveLevel(
-    LogLevel level
-)
+void Log::setActiveLevel(LogLevel level)
 {
     get().m_buffer.setActiveLevel(level);
 }
 
-void Log::setThresholdLevel(
-    LogLevel level
-)
+void Log::setThresholdLevel(LogLevel level)
 {
     get().m_buffer.setThresholdLevel(level);
 }
 
-void Log::setFile(
-    const std::filesystem::path& logFile
-)
+void Log::setFile(const std::filesystem::path& logFile)
 {
     get().m_buffer.setFile(logFile);
 }
 
-void Log::setStdoutEnabled(
-    bool stdoutEnabled
-)
+void Log::setStdoutEnabled(bool stdoutEnabled)
 {
     get().m_buffer.setStdoutEnabled(stdoutEnabled);
 }
 
-std::ostream& Log::trace(
-)
+std::ostream& Log::trace()
 {
     get() << TracePrefix;
     setActiveLevel(LogLevel::Trace);
     return get();
 }
 
-std::ostream& Log::debug(
-)
+std::ostream& Log::debug()
 {
     get() << DebugPrefix;
     setActiveLevel(LogLevel::Debug);
     return get();
 }
 
-std::ostream& Log::info(
-)
+std::ostream& Log::info()
 {
     get() << InfoPrefix;
     setActiveLevel(LogLevel::Info);
     return get();
 }
 
-std::ostream& Log::warning(
-)
+std::ostream& Log::warning()
 {
     get() << WarningPrefix;
     setActiveLevel(LogLevel::Warning);
     return get();
 }
 
-std::ostream& Log::error(
-)
+std::ostream& Log::error()
 {
     get() << ErrorPrefix;
     setActiveLevel(LogLevel::Error);
     return get();
 }
 
-std::ostream& Log::fatal(
-)
+std::ostream& Log::fatal()
 {
     get() << FatalPrefix;
     setActiveLevel(LogLevel::Fatal);
@@ -235,8 +206,7 @@ Log::Log(
 {
 }
 
-Log::~Log(
-)
+Log::~Log()
 {
     flush();
 }

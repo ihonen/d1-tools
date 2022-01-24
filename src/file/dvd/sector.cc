@@ -1,66 +1,60 @@
-extern "C" {
-#include "file/dvd/sector.h"
-}
-
+#include "file/dvd/sector.hh"
 #include "common/log.hh"
-
-#include <string>
 
 // -----------------------------------------------------------------------------
 
-const char* D1DvdSectorId_toString(D1DvdSectorId id)
+std::string DvdSector_toString(DvdSector sector)
 {
-    switch (id)
+    switch (sector)
     {
-    case D1DvdSectorAi:   return "AI";
-    case D1DvdSectorBgnd: return "BGND";
-    case D1DvdSectorBond: return "BOND";
-    case D1DvdSectorBuil: return "BUIL";
-    case D1DvdSectorCart: return "CART";
-    case D1DvdSectorDlgs: return "DLGS";
-    case D1DvdSectorElem: return "ELEM";
-    case D1DvdSectorFxbk: return "FXBK";
-    case D1DvdSectorJump: return "JUMP";
-    case D1DvdSectorLift: return "LIFT";
-    case D1DvdSectorMask: return "MASK";
-    case D1DvdSectorMat:  return "MAT";
-    case D1DvdSectorMisc: return "MISC";
-    case D1DvdSectorMove: return "MOVE";
-    case D1DvdSectorMsic: return "MSIC";
-    case D1DvdSectorPat:  return "PAT";
-    case D1DvdSectorScrp: return "SCRP";
-    case D1DvdSectorSght: return "SGHT";
-    case D1DvdSectorSnd:  return "SND";
-    case D1DvdSectorWays: return "WAYS";
+    case DvdSector::Ai:   return "AI";
+    case DvdSector::Bgnd: return "BGND";
+    case DvdSector::Bond: return "BOND";
+    case DvdSector::Buil: return "BUIL";
+    case DvdSector::Cart: return "CART";
+    case DvdSector::Dlgs: return "DLGS";
+    case DvdSector::Elem: return "ELEM";
+    case DvdSector::Fxbk: return "FXBK";
+    case DvdSector::Jump: return "JUMP";
+    case DvdSector::Lift: return "LIFT";
+    case DvdSector::Mask: return "MASK";
+    case DvdSector::Mat:  return "MAT";
+    case DvdSector::Misc: return "MISC";
+    case DvdSector::Move: return "MOVE";
+    case DvdSector::Msic: return "MSIC";
+    case DvdSector::Pat:  return "PAT";
+    case DvdSector::Scrp: return "SCRP";
+    case DvdSector::Sght: return "SGHT";
+    case DvdSector::Snd:  return "SND";
+    case DvdSector::Ways: return "WAYS";
     }
 
-    Log::fatal() << "Invalid DVD sector " << id << "\n" << std::flush;
+    Log::fatal() << "Invalid DVD sector " << static_cast<int>(sector) << "\n" << std::flush;
     abort();
 }
 
-D1DvdSectorId D1DvdSectorId_fromString(const char* str_)
+DvdSector DvdSector_fromString(const std::string& str)
 {
-    std::string str = str_;
-    if (str == "AI")   return D1DvdSectorAi;
-    if (str == "BGND") return D1DvdSectorBgnd;
-    if (str == "BOND") return D1DvdSectorBond;
-    if (str == "BUIL") return D1DvdSectorBuil;
-    if (str == "CART") return D1DvdSectorCart;
-    if (str == "DLGS") return D1DvdSectorDlgs;
-    if (str == "ELEM") return D1DvdSectorElem;
-    if (str == "FXBK") return D1DvdSectorFxbk;
-    if (str == "JUMP") return D1DvdSectorJump;
-    if (str == "LIFT") return D1DvdSectorLift;
-    if (str == "MASK") return D1DvdSectorMask;
-    if (str == "MAT")  return D1DvdSectorMat;
-    if (str == "MISC") return D1DvdSectorMisc;
-    if (str == "MOVE") return D1DvdSectorMove;
-    if (str == "MSIC") return D1DvdSectorMsic;
-    if (str == "PAT")  return D1DvdSectorPat;
-    if (str == "SCRP") return D1DvdSectorScrp;
-    if (str == "SGHT") return D1DvdSectorSght;
-    if (str == "SND")  return D1DvdSectorSnd;
-    if (str == "WAYS") return D1DvdSectorWays;
+    if (str == "AI")   return DvdSector::Ai;
+    if (str == "BGND") return DvdSector::Bgnd;
+    if (str == "BOND") return DvdSector::Bond;
+    if (str == "BUIL") return DvdSector::Buil;
+    if (str == "CART") return DvdSector::Cart;
+    if (str == "DLGS") return DvdSector::Dlgs;
+    if (str == "ELEM") return DvdSector::Elem;
+    if (str == "FXBK") return DvdSector::Fxbk;
+    if (str == "JUMP") return DvdSector::Jump;
+    if (str == "LIFT") return DvdSector::Lift;
+    if (str == "MASK") return DvdSector::Mask;
+    if (str == "MAT")  return DvdSector::Mat;
+    if (str == "MISC") return DvdSector::Misc;
+    if (str == "MOVE") return DvdSector::Move;
+    if (str == "MSIC") return DvdSector::Msic;
+    if (str == "PAT")  return DvdSector::Pat;
+    if (str == "SCRP") return DvdSector::Scrp;
+    if (str == "SGHT") return DvdSector::Sght;
+    if (str == "SND")  return DvdSector::Snd;
+    if (str == "WAYS") return DvdSector::Ways;
 
     Log::fatal() << "Invalid DVD sector " << str << "\n" << std::flush;
     abort();

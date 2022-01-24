@@ -2,13 +2,7 @@
 
 // -----------------------------------------------------------------------------
 
-using d1::level_editor::PropertyView;
-
-// -----------------------------------------------------------------------------
-
-PropertyView::PropertyView(
-    QWidget* parent
-)
+PropertyView::PropertyView(QWidget* parent)
     : QTabWidget(parent)
 {
     setTabPosition(QTabWidget::West);

@@ -1,34 +1,21 @@
-extern "C" {
-#include "file/dvd/bgnd.h"
-#include "file/dvd/file.h"
-#include "file/dvd/sector.h"
-#include "level/map.h"
-#include "level/minimap.h"
-}
-
 #include "common/log.hh"
+#include "file/dvd/bgnd.hh"
+#include "file/dvd/file.hh"
+#include "file/dvd/sector.hh"
+#include "level/map.hh"
+#include "level/minimap.hh"
 
 // TODO: This is dumb, but fixes a build error.
 namespace {
 #include <mio/mio.hpp>
 }
 
-#include <filesystem>
-
-struct D1DvdFile
-{
-    std::filesystem::path path;
-
-    std::string levelName = "";
-
-    D1Map*     map     = nullptr;
-    D1Minimap* minimap = nullptr;
-};
+// -----------------------------------------------------------------------------
 
 #pragma pack(push, 1)
 struct DvdSectorHeader
 {
-    D1DvdSectorId sectorId;
+    DvdSector sectorId;
     uint32_t sectorDataSize;
 };
 #pragma pack(pop)
@@ -37,48 +24,42 @@ static_assert(sizeof(DvdSectorHeader) == 8);
 
 // -----------------------------------------------------------------------------
 
-D1DvdFile* D1DvdFile_newFromFile(
-    const char* path
-)
+DvdFile::DvdFile(const std::filesystem::path& path)
 {
-    auto file = new D1DvdFile;
-
-    file->path = path;
-    file->levelName = file->path.stem().string();
+    m_path = path;
+    m_levelName = m_path.stem().string();
 
     mio::mmap_source memmap;
     std::error_code errorCode;
-    memmap.map(path, errorCode);
+    memmap.map(path.string(), errorCode);
     if (errorCode)
     {
-        Log::fatal() << "Failed to load '" << path << "'\n" << std::flush;
+        throw std::runtime_error("Failed to load " + path.string() + "\n");
     }
 
-    auto fileSize   = std::filesystem::file_size(path);
-    auto fileBegin  = reinterpret_cast<const uint8_t*>(memmap.data());
-    auto fileEnd    = fileBegin + fileSize;
+    auto fileSize = std::filesystem::file_size(path);
+    auto fileBegin = reinterpret_cast<const uint8_t*>(memmap.data());
+    auto fileEnd = fileBegin + fileSize;
 
     auto currentByte = fileBegin;
     while (currentByte < fileEnd)
     {
         auto sectorHeader = reinterpret_cast<const DvdSectorHeader*>(currentByte);
-        auto sectorData   = currentByte + sizeof(DvdSectorHeader);
+        auto sectorData = currentByte + sizeof(DvdSectorHeader);
 
         switch (sectorHeader->sectorId)
         {
-        case D1DvdSectorBgnd:
-            Log::debug() << "Loading " << file->levelName << " sector BGND\n" << std::flush;
-            file->minimap = d1_parseDvdBgndSectorData(
+        case DvdSector::Bgnd:
+            Log::debug() << "Loading sector BGND\n" << std::flush;
+            m_minimap = parseBgndSector(
                 sectorData,
                 sectorHeader->sectorDataSize
             );
             break;
         default:
             Log::warning()
-                << "Skipping "
-                << file->levelName
-                << " sector "
-                << D1DvdSectorId_toString(sectorHeader->sectorId)
+                << "Skipping sector "
+                << DvdSector_toString(sectorHeader->sectorId)
                 << "\n"
                 << std::flush;
             break;
@@ -86,23 +67,9 @@ D1DvdFile* D1DvdFile_newFromFile(
 
         currentByte += sizeof(DvdSectorHeader) + sectorHeader->sectorDataSize;
     }
-     
-    return file;
 }
 
-void D1DvdFile_free(
-    D1DvdFile* file
-)
+const std::shared_ptr<Minimap>& DvdFile::minimap() const
 {
-    D1Minimap_free(file->minimap);
-    delete file;
-}
-
-D1Minimap* D1DvdFile_stealMinimap(
-    D1DvdFile* file
-)
-{
-    auto minimap = file->minimap;
-    file->minimap = nullptr;
-    return minimap;
+    return m_minimap;
 }

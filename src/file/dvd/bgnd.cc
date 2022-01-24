@@ -1,17 +1,14 @@
-extern "C" {
-#include "common/bzip2.h"
-#include "file/dvd/bgnd.h"
-#include "image/pixel.h"
-#include "level/minimap.h"
-}
-
+#include "common/bzip2.hh"
 #include "common/log.hh"
+#include "file/dvd/bgnd.hh"
+#include "image/pixel.hh"
+#include "level/minimap.hh"
 
 #include <string>
 
 // -----------------------------------------------------------------------------
 
-D1Minimap* d1_parseDvdBgndSectorData(
+std::shared_ptr<Minimap> parseBgndSector(
     const uint8_t* firstByteOfData,
     uint32_t dataSize
 )
@@ -50,7 +47,7 @@ D1Minimap* d1_parseDvdBgndSectorData(
 
     auto numPixels = width * height;
     unsigned decompressedDataSize = numPixels * sizeof(Bgr565);
-    auto bgr565Pixels = new Bgr565[numPixels];
+    Bgr565* bgr565Pixels = new Bgr565[numPixels];
 
     bzip2Decompress(
         bgr565Pixels,
@@ -67,21 +64,15 @@ D1Minimap* d1_parseDvdBgndSectorData(
         abort();
     }
 
-    auto pixels = new Bgr888[numPixels];
-
+    auto bgr888Pixels = std::vector<Bgr888>(numPixels, {0, 0, 0});
     for (size_t i = 0; i < numPixels; ++i)
     {
-        bgr565_to_bgr888(&bgr565Pixels[i], &pixels[i]);
+        bgr565_to_bgr888(&bgr565Pixels[i], &bgr888Pixels[i]);
     }
 
-    auto minimap = D1Minimap_new(
-        width,
-        height,
-        pixels
-    );
+    auto minimap = std::make_shared<Minimap>(width, height, bgr888Pixels);
 
     delete[] bgr565Pixels;
-    delete[] pixels;
 
     return minimap;
 }

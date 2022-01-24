@@ -17,13 +17,9 @@ enum class LogLevel
     Fatal,
 };
 
-LogLevel verbosityToLogLevel(
-    unsigned verbosity
-);
+LogLevel verbosityToLogLevel(unsigned verbosity);
 
-unsigned logLevelToVerbosity(
-    LogLevel level
-);
+unsigned logLevelToVerbosity(LogLevel level);
 
 // -----------------------------------------------------------------------------
 
@@ -37,27 +33,17 @@ public:
         LogLevel thresholdLevel
     );
 
-    ~LogBuffer(
-    ) override;
+    ~LogBuffer() override;
 
-    void setFile(
-        const std::filesystem::path& logFile
-    );
+    void setFile(const std::filesystem::path& logFile);
 
-    void setStdoutEnabled(
-        bool stdoutEnabled
-    );
+    void setStdoutEnabled(bool stdoutEnabled);
 
-    void setActiveLevel(
-        LogLevel level
-    );
+    void setActiveLevel(LogLevel level);
     
-    void setThresholdLevel(
-        LogLevel level
-    );
+    void setThresholdLevel(LogLevel level);
 
-    int sync(
-    ) override;
+    int sync() override;
 
 private:
 
@@ -76,38 +62,25 @@ class Log : private std::ostream
 {
 public:
 
-    static Log& get(
-    );
+    static Log& get();
 
-    static void setThresholdLevel(
-        LogLevel level
-    );
+    static void setThresholdLevel(LogLevel level);
     
-    static void setFile(
-        const std::filesystem::path& logFile
-    );
+    static void setFile(const std::filesystem::path& logFile);
 
-    static void setStdoutEnabled(
-        bool stdoutEnabled
-    );
+    static void setStdoutEnabled(bool stdoutEnabled);
 
-    static std::ostream& trace(
-    );
+    static std::ostream& trace();
 
-    static std::ostream& debug(
-    );
+    static std::ostream& debug();
 
-    static std::ostream& info(
-    );
+    static std::ostream& info();
 
-    static std::ostream& warning(
-    );
+    static std::ostream& warning();
 
-    static std::ostream& error(
-    );
+    static std::ostream& error();
 
-    static std::ostream& fatal(
-    );
+    static std::ostream& fatal();
 
 private:
 
@@ -117,12 +90,9 @@ private:
         LogLevel thresholdLevel = LogLevel::Trace
     );
 
-    ~Log(
-    ) override;
+    ~Log() override;
 
-    static void setActiveLevel(
-        LogLevel level
-    );
+    static void setActiveLevel(LogLevel level);
 
 private:
 

@@ -1,14 +1,14 @@
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 // ---------------------------------------------------------------------------
 
-typedef struct D1Minimap D1Minimap;
+class Minimap;
 
 // ---------------------------------------------------------------------------
 
-D1Minimap* d1_parseDvdBgndSectorData(
+std::shared_ptr<Minimap> parseBgndSector(
     const uint8_t* firstByteOfData,
     uint32_t dataSize
 );

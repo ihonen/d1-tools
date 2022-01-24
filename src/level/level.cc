@@ -1,12 +1,9 @@
-extern "C" {
-#include "file/dvd/file.h"
-#include "file/dvm/file.h"
-#include "level/map.h"
-#include "level/minimap.h"
-#include "level/level.h"
-}
-
 #include "common/log.hh"
+#include "file/dvd/file.hh"
+#include "file/dvm/file.hh"
+#include "level/level.hh"
+#include "level/map.hh"
+#include "level/minimap.hh"
 
 // This fixes a build error. ._.
 namespace {
@@ -17,64 +14,30 @@ namespace {
 
 // -----------------------------------------------------------------------------
 
-struct D1Level
+Level::Level(const std::filesystem::path& dvdFilePath)
 {
-    std::string name;
+    auto dvmFilePath = dvdFilePath;
+    dvmFilePath.replace_extension(".dvm");
 
-    D1Map*     map     = nullptr;
-    D1Minimap* minimap = nullptr;
-};
+    auto dvdFile = DvdFile(dvdFilePath);
+    auto dvmFile = DvmFile(dvmFilePath);
 
-// -----------------------------------------------------------------------------
-
-D1Level* D1Level_newFromDvdFile(
-    const char* path
-)
-{
-    auto dvdPath = std::filesystem::path(path);
-    auto dvmPath = dvdPath;
-    dvmPath.replace_extension(".dvm");
-
-    auto dvdFile = D1DvdFile_newFromFile(dvdPath.string().c_str());
-    auto dvmFile = D1DvmFile_newFromFile(dvmPath.string().c_str());
-
-    auto level = new D1Level;
-    level->name = dvdPath.stem().string();
-    level->map = D1DvmFile_stealMap(dvmFile);
-    level->minimap = D1DvdFile_stealMinimap(dvdFile);
-
-    D1DvdFile_free(dvdFile);
-    D1DvmFile_free(dvmFile);
-
-    return level;
+    m_name = dvdFilePath.stem().string();
+    m_map = dvmFile.map();
+    m_minimap = dvdFile.minimap();
 }
 
-void D1Level_free(
-    D1Level* level
-)
+const std::string& Level::name() const
 {
-    D1Map_free(level->map);
-    D1Minimap_free(level->minimap);
-    delete level;
+    return m_name;
 }
 
-const char* D1Level_name(
-    D1Level* level
-)
+const std::shared_ptr<Map>& Level::map() const
 {
-    return level->name.c_str();
+    return m_map;
 }
 
-D1Map* D1Level_map(
-    D1Level* level
-)
+const std::shared_ptr<Minimap>& Level::minimap() const
 {
-    return level->map;
-}
-
-D1Minimap* D1Level_minimap(
-    D1Level* level
-)
-{
-    return level->minimap;
+    return m_minimap;
 }

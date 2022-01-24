@@ -2,17 +2,11 @@
 
 #include <QTabWidget>
 
-namespace d1::level_editor
+class PropertyView
+    : public QTabWidget
 {
-    
-    class PropertyView
-        : public QTabWidget
-    {
-        Q_OBJECT
-    public:
+    Q_OBJECT
+public:
 
-        PropertyView(
-            QWidget* parent = nullptr
-        );
-    };
-}
+    PropertyView(QWidget* parent = nullptr);
+};

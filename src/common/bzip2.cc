@@ -1,7 +1,4 @@
-extern "C" {
-#include "common/bzip2.h"
-}
-
+#include "common/bzip2.hh"
 #include "common/log.hh"
 
 #include <bzlib.h>

@@ -1,66 +1,31 @@
-extern "C" {
-#include "common/bzip2.h"
-#include "image/pixel.h"
-#include "level/level.h"
-#include "level/minimap.h"
-}
-
+#include "common/bzip2.hh"
 #include "common/log.hh"
+#include "image/pixel.hh"
+#include "level/level.hh"
+#include "level/minimap.hh"
 
 #include <vector>
 
 // -----------------------------------------------------------------------------
 
-struct D1Minimap
+Minimap::Minimap(uint16_t width, uint16_t height, const std::vector<Bgr888>& pixels)
+    : m_width(width)
+    , m_height(height)
+    , m_pixels(pixels)
 {
-    uint16_t width      = 0;
-    uint16_t height     = 0;
-    std::vector<Bgr888> pixels;
-};
-
-// -----------------------------------------------------------------------------
-
-D1Minimap* D1Minimap_new(
-    uint16_t width,
-    uint16_t height,
-    const Bgr888* pixels
-)
-{
-    auto minimap = new D1Minimap;
-    minimap->width = width;
-    minimap->height = height;
-    minimap->pixels = std::vector<Bgr888>(
-        pixels,
-        pixels + width * height
-    );
-
-    return minimap;
 }
 
-void D1Minimap_free(
-    D1Minimap* minimap
-)
+uint16_t Minimap::width() const
 {
-    delete minimap;
+    return m_width;
 }
 
-const Bgr888* D1Minimap_pixels(
-    const D1Minimap* minimap
-)
+uint16_t Minimap::height() const
 {
-    return minimap->pixels.data();
+    return m_height;
 }
 
-uint16_t D1Minimap_width(
-    const D1Minimap* minimap
-)
+const Bgr888* Minimap::pixels() const
 {
-    return minimap->width;
-}
-
-uint16_t D1Minimap_height(
-    const D1Minimap* minimap
-)
-{
-    return minimap->height;
+    return m_pixels.data();
 }

@@ -1,72 +1,34 @@
-extern "C" {
-#include "common/bzip2.h"
-#include "image/pixel.h"
-#include "level/level.h"
-#include "level/map.h"
-}
-
+#include "common/bzip2.hh"
 #include "common/log.hh"
+#include "image/pixel.hh"
+#include "level/level.hh"
+#include "level/map.hh"
 
 // TODO: This is dumb, but fixes a build error.
 namespace {
 #include <mio/mio.hpp>
 }
 
-#include <vector>
-
 // -----------------------------------------------------------------------------
 
-struct D1Map
+Map::Map(uint16_t width, uint16_t height, const std::vector<Bgr888>& pixels)
+    : m_width(width)
+    , m_height(height)
+    , m_pixels(pixels)
 {
-    uint16_t width  = 0;
-    uint16_t height = 0;
-
-    std::vector<Bgr888> pixels;
-};
-
-// -----------------------------------------------------------------------------
-
-D1Map* D1Map_new(
-    uint16_t width,
-    uint16_t height,
-    const Bgr888* pixels
-)
-{
-    auto map = new D1Map;
-    map->width = width;
-    map->height = height;
-    map->pixels = std::vector<Bgr888>(
-        pixels,
-        pixels + width * height
-    );
-
-    return map;
 }
 
-void D1Map_free(
-    D1Map* map
-)
+uint16_t Map::width() const
 {
-    delete map;
+    return m_width;
 }
 
-const Bgr888* D1Map_pixels(
-    const D1Map* map
-)
+uint16_t Map::height() const
 {
-    return map->pixels.data();
+    return m_height;
 }
 
-uint16_t D1Map_width(
-    const D1Map* map
-)
+const Bgr888* Map::pixels() const
 {
-    return map->width;
-}
-
-uint16_t D1Map_height(
-    const D1Map* map
-)
-{
-    return map->height;
+    return m_pixels.data();
 }
