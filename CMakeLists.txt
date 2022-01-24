@@ -6,4 +6,5 @@ project(d1-tools)
 
 # ------------------------------------------------------------------------------
 
-add_subdirectory(cmake)
+add_subdirectory(lib)
+add_subdirectory(src)
