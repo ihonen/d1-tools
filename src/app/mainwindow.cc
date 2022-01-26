@@ -7,9 +7,12 @@
 #include <QAction>
 #include <QDockWidget>
 #include <QFileDialog>
+#include <QKeySequence>
 #include <QMenu>
 #include <QMenuBar>
 #include <QSettings>
+#include <QShortcut>
+#include <QStatusBar>
 
 #include <filesystem>
 #include <iostream>
@@ -19,6 +22,9 @@
 MainWindow::MainWindow()
     : QMainWindow(nullptr)
 {
+    m_statusBar = new QStatusBar(this);
+    setStatusBar(m_statusBar);
+
     m_fileMenu = new QMenu("File", this);
     m_openAction = new QAction("Open", this);
     m_fileMenu->addAction(m_openAction);
@@ -38,6 +44,27 @@ MainWindow::MainWindow()
         &QAction::triggered,
         this,
         &MainWindow::onOpenAction
+    );
+
+    connect(
+        m_mapView,
+        &MapView::mousePositionChanged,
+        [this](auto x, auto y)
+        {
+            m_statusBar->showMessage(QString("%1, %2").arg(x).arg(y));
+        }
+    );
+
+    auto shortcut1 = new QShortcut(
+        QKeySequence("F1"),
+        this,
+        [this]() { m_mapView->setMapVisible(!m_mapView->isMapVisible()); }
+    );
+
+    auto shortcut2 = new QShortcut(
+        QKeySequence("F2"),
+        this,
+        [this]() { m_mapView->setBuildingsVisible(!m_mapView->isBuildingsVisible()); }
     );
 }
 

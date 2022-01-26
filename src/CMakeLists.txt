@@ -34,15 +34,19 @@ set(CMAKE_AUTOUIC ON)
 add_executable(d1-level-editor
     app/main.cc
     app/mainwindow.cc
+    app/mapscene.cc
     app/mapview.cc
     app/propertyview.cc
     common/bzip2
     common/log.cc
     file/dvd/bgnd.cc
+    file/dvd/buil.cc
     file/dvd/file.cc
     file/dvd/sector.cc
     file/dvm/file.cc
     image/pixel.cc
+    level/building.cc
+    level/door.cc
     level/level.cc
     level/map.cc
     level/minimap.cc

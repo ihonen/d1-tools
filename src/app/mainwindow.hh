@@ -35,4 +35,6 @@ private:
     PropertyView* m_propertyView = nullptr;
         
     std::shared_ptr<Level> m_openLevel = nullptr;
+
+    QStatusBar* m_statusBar = nullptr;
 };

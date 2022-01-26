@@ -1,5 +1,6 @@
 #include "common/log.hh"
 #include "file/dvd/bgnd.hh"
+#include "file/dvd/buil.hh"
 #include "file/dvd/file.hh"
 #include "file/dvd/sector.hh"
 #include "level/map.hh"
@@ -56,6 +57,13 @@ DvdFile::DvdFile(const std::filesystem::path& path)
                 sectorHeader->sectorDataSize
             );
             break;
+        case DvdSector::Buil:
+            Log::debug() << "Loading sector BUIL\n" << std::flush;
+            m_buildings = parseBuilSector(
+                sectorData,
+                sectorHeader->sectorDataSize
+            );
+            break;
         default:
             Log::warning()
                 << "Skipping sector "
@@ -72,4 +80,9 @@ DvdFile::DvdFile(const std::filesystem::path& path)
 const std::shared_ptr<Minimap>& DvdFile::minimap() const
 {
     return m_minimap;
+}
+
+const std::vector<std::shared_ptr<Building>>& DvdFile::buildings() const
+{
+    return m_buildings;
 }
