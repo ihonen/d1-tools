@@ -19,12 +19,8 @@ std::vector<std::shared_ptr<Building>> parseBuilSector(
     auto version = *reinterpret_cast<const uint32_t*>(currentByte);
     currentByte += sizeof(uint32_t);
 
-    std::cout << "version = " << version << "\n";
-
     auto numBuildings = *reinterpret_cast<const uint16_t*>(currentByte);
     currentByte += sizeof(uint16_t);
-
-    std::cout << "numBuildings = " << numBuildings << "\n";
 
     for (size_t iBuilding = 0; iBuilding < numBuildings; ++iBuilding)
     {
@@ -50,109 +46,76 @@ std::vector<std::shared_ptr<Building>> parseBuilSector(
 
         for (size_t iDoor = 0; iDoor < numDoors; ++iDoor)
         {
-            std::vector<Coord> outlineCoords;
-            Coord frontCoord;
-            Coord onCoord;
-            Coord inCoord;
+            std::vector<Coord2d> outlineCoords;
+            std::vector<Coord3d> entryCoords;
 
             // 1
+
+            auto doorType = *reinterpret_cast<const uint8_t*>(currentByte);
+            currentByte += sizeof(uint8_t);
+
+            auto unknownByte01 = *reinterpret_cast<const uint8_t*>(currentByte);
+            currentByte += sizeof(uint8_t);
+
+            auto locked = *reinterpret_cast<const uint8_t*>(currentByte);
+            currentByte += sizeof(uint8_t);
+
+            auto lockPickable = *reinterpret_cast<const uint8_t*>(currentByte);
+            currentByte += sizeof(uint8_t);
+
+            auto unknownByte04 = *reinterpret_cast<const uint8_t*>(currentByte);
+            currentByte += sizeof(uint8_t);
+
+            auto unknownByte05 = *reinterpret_cast<const uint8_t*>(currentByte);
+            currentByte += sizeof(uint8_t);
+
+            auto unknownByte06 = *reinterpret_cast<const uint8_t*>(currentByte);
+            currentByte += sizeof(uint8_t);
+
+            auto unknownByte07 = *reinterpret_cast<const uint8_t*>(currentByte);
+            currentByte += sizeof(uint8_t);
+
+            auto unknownByte08 = *reinterpret_cast<const uint8_t*>(currentByte);
+            currentByte += sizeof(uint8_t);
+
+            auto unknownByte09 = *reinterpret_cast<const uint8_t*>(currentByte);
+            currentByte += sizeof(uint8_t);
+
+            auto numOutlineCoords = *reinterpret_cast<const uint16_t*>(currentByte);
+            currentByte += sizeof(uint16_t);
+
+            for (size_t iCoord = 0; iCoord < numOutlineCoords; ++iCoord)
             {
-                auto doorUnkByte00 = *reinterpret_cast<const uint8_t*>(currentByte);
-                currentByte += sizeof(uint8_t);
-
-                auto doorUnkByte01 = *reinterpret_cast<const uint8_t*>(currentByte);
-                currentByte += sizeof(uint8_t);
-
-                auto doorUnkByte02 = *reinterpret_cast<const uint8_t*>(currentByte);
-                currentByte += sizeof(uint8_t);
-
-                auto doorUnkByte03 = *reinterpret_cast<const uint8_t*>(currentByte);
-                currentByte += sizeof(uint8_t);
-
-                auto doorUnkByte04 = *reinterpret_cast<const uint8_t*>(currentByte);
-                currentByte += sizeof(uint8_t);
-
-                auto doorUnkByte05 = *reinterpret_cast<const uint8_t*>(currentByte);
-                currentByte += sizeof(uint8_t);
-
-                auto doorUnkByte06 = *reinterpret_cast<const uint8_t*>(currentByte);
-                currentByte += sizeof(uint8_t);
-
-                auto doorUnkByte07 = *reinterpret_cast<const uint8_t*>(currentByte);
-                currentByte += sizeof(uint8_t);
-
-                auto doorUnkByte08 = *reinterpret_cast<const uint8_t*>(currentByte);
-                currentByte += sizeof(uint8_t);
-
-                auto doorUnkByte09 = *reinterpret_cast<const uint8_t*>(currentByte);
-                currentByte += sizeof(uint8_t);
-
-                auto numCoords = *reinterpret_cast<const uint16_t*>(currentByte);
-                currentByte += sizeof(uint16_t);
-
-                for (size_t iCoord = 0; iCoord < numCoords; ++iCoord)
-                {
-                    auto coord = *reinterpret_cast<const Coord*>(currentByte);
-                    currentByte += sizeof(Coord);
-
-                    outlineCoords.push_back(coord);
-                }
+                outlineCoords.push_back(*reinterpret_cast<const Coord2d*>(currentByte));
+                currentByte += sizeof(Coord2d);
             }
 
-            // 2
+            auto numEntryCoords = *reinterpret_cast<const uint16_t*>(currentByte);
+            currentByte += sizeof(uint16_t);
+
+            for (size_t iCoord = 0; iCoord < numEntryCoords; ++iCoord)
             {
-                auto idPoints = *reinterpret_cast<const uint16_t*>(currentByte);
-                currentByte += sizeof(uint16_t);
-
-                auto coord = *reinterpret_cast<const Coord*>(currentByte);
-                currentByte += sizeof(Coord);
-
-                auto doorUnkWord00 = *reinterpret_cast<const uint16_t*>(currentByte);
-                currentByte += sizeof(uint16_t);
-
-                auto doorUnkWord01 = *reinterpret_cast<const uint16_t*>(currentByte);
-                currentByte += sizeof(uint16_t);
-
-                frontCoord = coord;
+                entryCoords.push_back(*reinterpret_cast<const Coord3d*>(currentByte));
+                currentByte += sizeof(Coord3d);
             }
 
-            // 3
-            {
-                auto coord = *reinterpret_cast<const Coord*>(currentByte);
-                currentByte += sizeof(Coord);
-
-                auto doorUnkWord02 = *reinterpret_cast<const uint16_t*>(currentByte);
-                currentByte += sizeof(uint16_t);
-
-                auto door3UnkWord03 = *reinterpret_cast<const uint16_t*>(currentByte);
-                currentByte += sizeof(uint16_t);
-
-                onCoord = coord;
-            }
-
-            // 4
-            {
-                auto coord = *reinterpret_cast<const Coord*>(currentByte);
-                currentByte += sizeof(Coord);
-
-                auto door4UnkWord04 = *reinterpret_cast<const uint16_t*>(currentByte);
-                currentByte += sizeof(uint16_t);
-
-                auto door4UnkWord05 = *reinterpret_cast<const uint16_t*>(currentByte);
-                currentByte += sizeof(uint16_t);
-
-                inCoord = coord;
-            }
-
-            // Experiment:
-            auto unknownWord = *reinterpret_cast<const uint16_t*>(currentByte);
+            // What is this last u16? Padding?
+            auto unknownWord__ = *reinterpret_cast<const uint16_t*>(currentByte);
             currentByte += sizeof(uint16_t);
 
             doors.push_back(std::make_shared<Door>(
                 outlineCoords,
-                frontCoord,
-                onCoord,
-                inCoord
+                entryCoords,
+                doorType,
+                locked,
+                unknownByte01,
+                lockPickable,
+                unknownByte04,
+                unknownByte05,
+                unknownByte06,
+                unknownByte07,
+                unknownByte08,
+                unknownByte09
             ));
         }
 

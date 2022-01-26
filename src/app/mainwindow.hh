@@ -7,11 +7,14 @@
 // -----------------------------------------------------------------------------
 
 class Level;
+
+class InfoView;
 class MapView;
 class PropertyView;
 
 class QAction;
 class QMenu;
+class QTextBrowser;
 
 // -----------------------------------------------------------------------------
 
@@ -30,11 +33,15 @@ private:
     QMenu* m_fileMenu = nullptr;
     QAction* m_openAction = nullptr;
 
-    QDockWidget* m_dock = nullptr;
     MapView* m_mapView = nullptr;
-    PropertyView* m_propertyView = nullptr;
-        
-    std::shared_ptr<Level> m_openLevel = nullptr;
 
+    QDockWidget* m_propertyDock = nullptr;
+    PropertyView* m_propertyView = nullptr;
+
+    QDockWidget* m_logDock = nullptr;
+    InfoView* m_infoView = nullptr;
+    
     QStatusBar* m_statusBar = nullptr;
+
+    std::shared_ptr<Level> m_openLevel = nullptr;
 };

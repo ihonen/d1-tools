@@ -32,6 +32,7 @@ set(CMAKE_AUTOUIC ON)
 # -----------------------------------------------------------------------------
 
 add_executable(d1-level-editor
+    app/infoview.cc
     app/main.cc
     app/mainwindow.cc
     app/mapscene.cc

@@ -1,3 +1,4 @@
+#include "app/graphicsitem.hh"
 #include "app/mapview.hh"
 #include "app/mapscene.hh"
 #include "common/log.hh"
@@ -9,6 +10,7 @@
 #include <QImage>
 #include <QMouseEvent>
 #include <QPixmap>
+#include <QTransform>
 
 #include <iostream>
 
@@ -29,10 +31,14 @@ void MapView::setLevel(const std::shared_ptr<Level>& level)
 {
     m_level = level;
     
-    clearMap();
-    drawMap();
+    m_scene->clear();
+    m_worldItems.clear();
+    m_graphicsItems.clear();
 
-    clearBuildings();
+    m_mapLayer.clear();
+    m_buildingsLayer.clear();
+
+    drawMap();
     drawBuildings();
 
     m_scene->setSceneRect(
@@ -41,12 +47,6 @@ void MapView::setLevel(const std::shared_ptr<Level>& level)
         dynamic_cast<QGraphicsPixmapItem*>(m_mapItem)->pixmap().width(),
         dynamic_cast<QGraphicsPixmapItem*>(m_mapItem)->pixmap().height()
     );
-}
-
-void MapView::clearMap()
-{
-    m_scene->removeItem(m_mapItem);
-    m_mapItem = nullptr;
 }
 
 void MapView::drawMap()
@@ -61,22 +61,14 @@ void MapView::drawMap()
     );
 
     m_mapItem = m_scene->addPixmap(QPixmap::fromImage(image));
-}
-
-void MapView::clearBuildings()
-{
-    for (const auto& item : m_builLayerItems)
-    {
-        m_scene->removeItem(item);
-    }
-    m_builLayerItems.clear();
+    m_mapLayer.push_back(m_mapItem);
 }
 
 void MapView::drawBuildings()
 {
     static const auto Pen1 = QPen(QColor{0, 0, 255}, 3);
     static const auto Pen2 = QPen(QColor{255, 0, 255}, 1);
-    static const auto Brush2 = QBrush(QColor{ 255, 0, 255 });
+    static const auto Brush2 = QBrush(QColor{255, 0, 255});
 
     for (const auto& building : m_level->buildings())
     {
@@ -85,33 +77,38 @@ void MapView::drawBuildings()
             const auto& outlineCoords = door->outlineCoords();
             for (size_t i = 0; i < outlineCoords.size(); ++i)
             {
-                const auto& [x1, y1] = door->outlineCoords()[i];
-                const auto& [x2, y2] = door->outlineCoords()[i < (outlineCoords.size() - 1) ? i + 1 : 0];
+                const auto& [x1, y1] = door->outlineCoords().at(i);
+                const auto& [x2, y2] = door->outlineCoords().at(i < (outlineCoords.size() - 1) ? i + 1 : 0);
 
-                m_builLayerItems.push_back(m_scene->addLine(x1, y1, x2, y2, Pen1));
+                auto item = m_scene->addLine(x1, y1, x2, y2, Pen1);
+                addItem(item, door, m_buildingsLayer);
             }
 
-            const auto& [x1, y1] = door->frontCoord();
-            const auto& [x2, y2] = door->onCoord();
-            const auto& [x3, y3] = door->inCoord();
+            const auto& entryCoords = door->entryCoords();
+            if (entryCoords.size() >= 2)
+            {
+                for (size_t i = 0; i < entryCoords.size() - 1; ++i)
+                {
+                    const auto& [x1, y1, z1, z_layer1] = door->entryCoords().at(i);
+                    const auto& [x2, y2, z2, z_layer2] = door->entryCoords().at(i + 1);
 
-            m_builLayerItems.push_back(m_scene->addLine(x1, y1, x2, y2, Pen1));
-            m_builLayerItems.push_back(m_scene->addLine(x2, y2, x3, y3, Pen1));
+                    auto item = m_scene->addLine(x1, y1, x2, y2, Pen1);
+                    addItem(item, door, m_buildingsLayer);
+                }
+            }
 
             for (const auto& coord : outlineCoords)
             {
-                m_builLayerItems.push_back(m_scene->addRect(coord.x - 1, coord.y - 1, 3, 3, Pen2, Brush2));
+                auto item4 = m_scene->addRect(coord.x - 1, coord.y - 1, 3, 3, Pen2, Brush2);
+                addItem(item4, door, m_buildingsLayer);
             }
 
-            m_builLayerItems.push_back(m_scene->addRect(x1 - 1, y1 - 1, 3, 3, Pen2, Brush2));
-            m_builLayerItems.push_back(m_scene->addRect(x2 - 1, y2 - 1, 3, 3, Pen2, Brush2));
-            m_builLayerItems.push_back(m_scene->addRect(x3 - 1, y3 - 1, 3, 3, Pen2, Brush2));
+            for (const auto& coord : entryCoords)
+            {
+                auto item4 = m_scene->addRect(coord.x - 1, coord.y - 1, 3, 3, Pen2, Brush2);
+                addItem(item4, door, m_buildingsLayer);
+            }
         }
-    }
-
-    for (const auto& item : m_builLayerItems)
-    {
-        item->setToolTip(QString("%1, %2").arg(item->x()).arg(item->y()));
     }
 
     /*
@@ -147,14 +144,14 @@ void MapView::drawBuildings()
             {{242, 298}, {225, 290}, {209, 278}},
         };
     }
-    else if (level->name() == "level_09")
+    else if (m_level->name() == "level_09")
     {
         pointsOfInterest = {
             {{850, 348}, {881, 330}, {896, 304}},
             {{874, 360}, {888, 334}, {922, 317}},
         };
     }
-    else if (level->name() == "level_10")
+    else if (m_level->name() == "level_10")
     {
         pointsOfInterest = {
             {{572, 1197}, {580, 1185}, {583, 1172}},
@@ -177,7 +174,7 @@ void MapView::drawBuildings()
             {{835, 1085}, {847, 1069}, {849, 1052}},
         };
     }
-    else if (level->name() == "level_11")
+    else if (m_level->name() == "level_11")
     {
         pointsOfInterest = {
             {{515, 355}, {515, 326}, {515, 297}},
@@ -188,14 +185,14 @@ void MapView::drawBuildings()
             {{233, 1069}, {248, 1064}, {265, 1059}},
         };
     }
-    else if (level->name() == "level_12")
+    else if (m_level->name() == "level_12")
     {
         pointsOfInterest = {
             {{242, 549}, {244, 538}, {245, 529}},
             {{691, 915}, {673, 900}, {650, 901}},
         };
     }
-    else if (level->name() == "level_13")
+    else if (m_level->name() == "level_13")
     {
         pointsOfInterest = {
             {{489, 360}, {477, 373}, {477, 341}, {489, 329}},
@@ -211,7 +208,7 @@ void MapView::drawBuildings()
             {{746, 758}, {738, 750}, {729, 744}},
         };
     }
-    else if (level->name() == "level_14")
+    else if (m_level->name() == "level_14")
     {
         pointsOfInterest = {
             {{738, 1006}, {732, 1012}, {726, 1019}},
@@ -221,7 +218,7 @@ void MapView::drawBuildings()
             {{754, 1005}, {747, 1013}, {739, 1021}},
         };
     }
-    else if (level->name() == "level_15")
+    else if (m_level->name() == "level_15")
     {
         pointsOfInterest = {
             {{1796, 971}, {1788, 963}, {1788, 944}, {1796, 952}, {1796, 971}},
@@ -239,7 +236,7 @@ void MapView::drawBuildings()
             {{1840, 524}, {1829, 513}, {1806, 502}},
         };
     }
-    else if (level->name() == "level_22")
+    else if (m_level->name() == "level_22")
     {
         pointsOfInterest = {
             {{1481, 1641}, {1455, 1646}, {1426, 1655}},
@@ -257,7 +254,7 @@ void MapView::drawBuildings()
             {{1660, 1279}},
         };
     }
-    else if (level->name() == "level_23")
+    else if (m_level->name() == "level_23")
     {
         pointsOfInterest = {
             {{1288, 549}, {1296, 537}, {1310, 530}},
@@ -313,7 +310,7 @@ bool MapView::isMapVisible() const
 
 void MapView::setBuildingsVisible(bool visible)
 {
-    for (const auto& item : m_builLayerItems)
+    for (const auto& item : m_buildingsLayer)
     {
         item->setVisible(visible);
     }
@@ -321,11 +318,28 @@ void MapView::setBuildingsVisible(bool visible)
 
 bool MapView::isBuildingsVisible() const
 {
-    return m_builLayerItems.size() == 0 || m_builLayerItems.at(0)->isVisible();
+    return m_buildingsLayer.size() == 0 || m_buildingsLayer.at(0)->isVisible();
+}
+
+void MapView::addItem(
+    QGraphicsItem* graphicsItem,
+    const std::shared_ptr<WorldItem>& worldItem,
+    std::vector<QGraphicsItem*>& layer
+)
+{
+    layer.push_back(graphicsItem);
+    m_worldItems[graphicsItem] = worldItem;
 }
 
 void MapView::mouseMoveEvent(QMouseEvent* event)
 {
     auto pos = mapToScene(event->pos());
     emit mousePositionChanged(pos.x(), pos.y());
+
+    auto graphicsItem = m_scene->itemAt(mapToScene(event->pos()), QTransform());
+    auto worldItem = m_worldItems.find(graphicsItem);
+    if (worldItem != m_worldItems.end())
+    {
+        emit worldItemHovered(worldItem->second);
+    }
 }

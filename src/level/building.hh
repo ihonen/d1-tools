@@ -1,6 +1,7 @@
 #pragma once
 
 #include "level/door.hh"
+#include "level/worlditem.hh"
 
 #include <memory>
 #include <vector>
@@ -8,6 +9,7 @@
 // -----------------------------------------------------------------------------
 
 class Building
+    : public WorldItem
 {
 public:
 

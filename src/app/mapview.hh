@@ -2,10 +2,14 @@
 
 #include <QGraphicsView>
 
+#include <map>
+
 // -----------------------------------------------------------------------------
 
+class GraphicsItem;
 class Level;
 class MapScene;
+class WorldItem;
 
 // -----------------------------------------------------------------------------
 
@@ -28,19 +32,29 @@ public:
 signals:
 
     void mousePositionChanged(int x, int y);
+    void worldItemHovered(const std::shared_ptr<WorldItem>& worldItem);
 
 private:
 
-    void clearMap();
-    void drawMap();
+    void addItem(
+        QGraphicsItem* graphicsItem,
+        const std::shared_ptr<WorldItem>& worldItem,
+        std::vector<QGraphicsItem*>& layer
+    );
 
-    void clearBuildings();
+    void drawMap();
     void drawBuildings();
 
     void mouseMoveEvent(QMouseEvent* event) override;
-
+    
     MapScene* m_scene = nullptr;
-    std::shared_ptr<Level> m_level = nullptr;
     QGraphicsItem* m_mapItem = nullptr;
-    std::vector<QGraphicsItem*> m_builLayerItems;
+
+    std::vector<QGraphicsItem*> m_mapLayer;
+    std::vector<QGraphicsItem*> m_buildingsLayer;
+
+    std::map<QGraphicsItem*, std::shared_ptr<WorldItem>> m_worldItems;
+    std::map<std::shared_ptr<WorldItem>, QGraphicsItem*> m_graphicsItems;
+
+    std::shared_ptr<Level> m_level = nullptr;
 };

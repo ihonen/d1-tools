@@ -11,6 +11,10 @@ Building::Building(
     , m_characterIds(characterIds)
     , m_doors(doors)
 {
+    for (const auto& door : m_doors)
+    {
+        door->setParent(this);
+    }
 }
 
 uint16_t Building::unknownWord00() const

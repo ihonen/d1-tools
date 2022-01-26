@@ -1,3 +1,4 @@
+#include "app/infoview.hh"
 #include "app/mainwindow.hh"
 #include "app/mapview.hh"
 #include "app/propertyview.hh"
@@ -7,12 +8,14 @@
 #include <QAction>
 #include <QDockWidget>
 #include <QFileDialog>
+#include <QFormLayout>
 #include <QKeySequence>
 #include <QMenu>
 #include <QMenuBar>
 #include <QSettings>
 #include <QShortcut>
 #include <QStatusBar>
+#include <QTextBrowser>
 
 #include <filesystem>
 #include <iostream>
@@ -33,11 +36,19 @@ MainWindow::MainWindow()
     m_mapView = new MapView(this);
     setCentralWidget(m_mapView);
 
-    m_dock = new QDockWidget(tr("Properties"), this);
-    m_dock->setAllowedAreas(Qt::RightDockWidgetArea);
-    m_propertyView = new PropertyView(m_dock);
-    m_dock->setWidget(m_propertyView);
-    addDockWidget(Qt::RightDockWidgetArea, m_dock);
+    m_propertyDock = new QDockWidget(tr("Properties"), this);
+    m_propertyDock->setAllowedAreas(Qt::RightDockWidgetArea);
+    m_propertyDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
+    m_propertyView = new PropertyView(m_propertyDock);
+    m_propertyDock->setWidget(m_propertyView);
+    addDockWidget(Qt::RightDockWidgetArea, m_propertyDock);
+
+    m_logDock = new QDockWidget(tr(""), this);
+    m_logDock->setAllowedAreas(Qt::LeftDockWidgetArea);
+    m_logDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
+    m_infoView = new InfoView(m_logDock);
+    m_logDock->setWidget(m_infoView);
+    addDockWidget(Qt::LeftDockWidgetArea, m_logDock);
 
     connect(
         m_openAction,
@@ -53,6 +64,13 @@ MainWindow::MainWindow()
         {
             m_statusBar->showMessage(QString("%1, %2").arg(x).arg(y));
         }
+    );
+
+    connect(
+        m_mapView,
+        &MapView::worldItemHovered,
+        m_infoView,
+        &InfoView::displayWorldItem
     );
 
     auto shortcut1 = new QShortcut(
