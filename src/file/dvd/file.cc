@@ -59,7 +59,8 @@ DvdFile::DvdFile(const std::filesystem::path& path)
             break;
         case DvdSector::Buil:
             Log::debug() << "Loading sector BUIL\n" << std::flush;
-            m_buildings = parseBuilSector(
+            std::tie(m_buildings, m_specialDoors) = parseBuilSector(
+                m_levelName,
                 sectorData,
                 sectorHeader->sectorDataSize
             );
@@ -85,4 +86,9 @@ const std::shared_ptr<Minimap>& DvdFile::minimap() const
 const std::vector<std::shared_ptr<Building>>& DvdFile::buildings() const
 {
     return m_buildings;
+}
+
+const std::vector<std::shared_ptr<Door>>& DvdFile::specialDoors() const
+{
+    return m_specialDoors;
 }

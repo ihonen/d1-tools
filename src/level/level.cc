@@ -26,6 +26,7 @@ Level::Level(const std::filesystem::path& dvdFilePath)
     m_map = dvmFile.map();
     m_minimap = dvdFile.minimap();
     m_buildings = dvdFile.buildings();
+    m_specialDoors = dvdFile.specialDoors();
 }
 
 const std::string& Level::name() const
@@ -46,4 +47,9 @@ const std::shared_ptr<Minimap>& Level::minimap() const
 const std::vector<std::shared_ptr<Building>>& Level::buildings() const
 {
     return m_buildings;
+}
+
+const std::vector<std::shared_ptr<Door>>& Level::specialDoors() const
+{
+    return m_specialDoors;
 }
