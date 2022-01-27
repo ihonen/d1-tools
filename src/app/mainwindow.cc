@@ -84,6 +84,17 @@ MainWindow::MainWindow()
         this,
         [this]() { m_mapView->setBuildingsVisible(!m_mapView->isBuildingsVisible()); }
     );
+
+    QSettings settings;
+    restoreGeometry(settings.value("MainWindow/geometry").toByteArray());
+    restoreState(settings.value("MainWindow/state").toByteArray());
+}
+
+void MainWindow::closeEvent(QCloseEvent* event)
+{
+    QSettings settings;
+    settings.setValue("MainWindow/geometry", saveGeometry());
+    settings.setValue("MainWindow/state", saveState());
 }
 
 void MainWindow::onOpenAction()

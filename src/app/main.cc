@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
     QApplication::setApplicationName("D1 Level Editor");
     
     MainWindow mainWindow;
-    mainWindow.showMaximized();
+    mainWindow.show();
     
     return qApplication.exec();
 }

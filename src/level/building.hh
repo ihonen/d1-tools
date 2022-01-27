@@ -14,12 +14,14 @@ class Building
 public:
 
     Building(
-        uint16_t unknownWord00,
+        uint8_t unknownByte00,
+        uint8_t unknownByte01,
         const std::vector<uint16_t>& characterIds,
         const std::vector<std::shared_ptr<Door>>& doors
     );
 
-    uint16_t unknownWord00() const;
+    uint8_t unknownByte00() const;
+    uint8_t unknownByte01() const;
 
     const std::vector<uint16_t>& characterIds() const;
 
@@ -27,7 +29,8 @@ public:
 
 private:
 
-    uint16_t m_unknownWord00;
+    uint8_t m_unknownByte00;
+    uint8_t m_unknownByte01;
     std::vector<uint16_t> m_characterIds;
     std::vector<std::shared_ptr<Door>> m_doors;
 };

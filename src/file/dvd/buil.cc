@@ -17,12 +17,11 @@ namespace
 
         auto currentByte = entryBegin;
 
-        auto doorType = *reinterpret_cast<const uint8_t*>(currentByte);
-        currentByte += sizeof(uint8_t);
+        auto doorType = *reinterpret_cast<const Door::Type*>(currentByte);
+        currentByte += sizeof(Door::Type);
 
         auto unknownByte01 = *reinterpret_cast<const uint8_t*>(currentByte);
         currentByte += sizeof(uint8_t);
-        //assert(unknownByte01 == 0x01);
 
         auto locked = *reinterpret_cast<const uint8_t*>(currentByte);
         currentByte += sizeof(uint8_t);
@@ -38,19 +37,19 @@ namespace
 
         auto unknownByte06 = *reinterpret_cast<const uint8_t*>(currentByte);
         currentByte += sizeof(uint8_t);
-        //assert(always_0x00_1 == 0x00);
+        assert(doorType == Door::Type::Normal ? unknownByte06 == 0x00 : true);
 
         auto unknownByte07 = *reinterpret_cast<const uint8_t*>(currentByte);
         currentByte += sizeof(uint8_t);
-        //assert(always_0x00_2 == 0x00);
+        assert(doorType == Door::Type::Normal ? unknownByte07 == 0x00 : true);
 
         auto unknownByte08 = *reinterpret_cast<const uint8_t*>(currentByte);
         currentByte += sizeof(uint8_t);
-        //assert(always_0x00_3 == 0x00);
+        assert(doorType == Door::Type::Normal ? unknownByte08 == 0x00 : true);
 
         auto unknownByte09 = *reinterpret_cast<const uint8_t*>(currentByte);
         currentByte += sizeof(uint8_t);
-        //assert(always_0x00_4 == 0x00);
+        assert(doorType == Door::Type::Normal ? unknownByte09 == 0x00 : true);
 
         auto numOutlineCoords = *reinterpret_cast<const uint16_t*>(currentByte);
         currentByte += sizeof(uint16_t);
@@ -63,6 +62,7 @@ namespace
 
         auto numEntryCoords = *reinterpret_cast<const uint16_t*>(currentByte);
         currentByte += sizeof(uint16_t);
+        assert(numEntryCoords == 3);
 
         for (size_t iCoord = 0; iCoord < numEntryCoords; ++iCoord)
         {
@@ -73,11 +73,15 @@ namespace
         auto unknownWord00 = *reinterpret_cast<const uint16_t*>(currentByte);
         currentByte += sizeof(uint16_t);
 
-        auto unknownWord01 = 0x0000;
+        uint16_t unknownByte10 = 0x00;
+        uint16_t unknownByte11 = 0x00;
         if (unknownWord00 != 0xffff)
         {
-            unknownWord01 = *reinterpret_cast<const uint16_t*>(currentByte);
-            currentByte += sizeof(uint16_t);
+            unknownByte10 = *reinterpret_cast<const uint8_t*>(currentByte);
+            currentByte += sizeof(uint8_t);
+
+            unknownByte11 = *reinterpret_cast<const uint8_t*>(currentByte);
+            currentByte += sizeof(uint8_t);
         }
 
         *entrySizeOut = currentByte - entryBegin;
@@ -86,8 +90,8 @@ namespace
             outlineCoords,
             entryCoords,
             doorType,
-            locked,
             unknownByte01,
+            locked,
             lockPickable,
             unknownByte04,
             unknownByte05,
@@ -96,7 +100,8 @@ namespace
             unknownByte08,
             unknownByte09,
             unknownWord00,
-            unknownWord01
+            unknownByte10,
+            unknownByte11
         );
     }
 }
@@ -118,6 +123,8 @@ parseBuilSector(
     auto version = *reinterpret_cast<const uint32_t*>(currentByte);
     currentByte += sizeof(uint32_t);
 
+    assert(version == 4);
+
     auto numBuildings = *reinterpret_cast<const uint16_t*>(currentByte);
     currentByte += sizeof(uint16_t);
 
@@ -126,8 +133,12 @@ parseBuilSector(
         std::vector<uint16_t> characterIds;
         std::vector<std::shared_ptr<Door>> doors;
 
-        auto buildingUnkWord00 = *reinterpret_cast<const uint16_t*>(currentByte);
-        currentByte += sizeof(uint16_t);
+        auto buildingUnkByte00 = *reinterpret_cast<const uint8_t*>(currentByte);
+        currentByte += sizeof(uint8_t);
+        
+        auto buildingUnkByte01 = *reinterpret_cast<const uint8_t*>(currentByte);
+        currentByte += sizeof(uint8_t);
+        assert(buildingUnkByte01 == 0x00);
 
         auto numCharacters = *reinterpret_cast<const uint16_t*>(currentByte);
         currentByte += sizeof(uint16_t);
@@ -152,7 +163,8 @@ parseBuilSector(
         }
 
         buildings.push_back(std::make_shared<Building>(
-            buildingUnkWord00,
+            buildingUnkByte00,
+            buildingUnkByte01,
             characterIds,
             doors
         ));

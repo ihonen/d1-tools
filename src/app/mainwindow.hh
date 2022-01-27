@@ -28,6 +28,8 @@ public:
 
 private:
 
+    void closeEvent(QCloseEvent* event) override;
+
     void onOpenAction();
 
     QMenu* m_fileMenu = nullptr;

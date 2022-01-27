@@ -5,9 +5,9 @@
 Door::Door(
     const std::vector<Coord2d>& outlineCoords,
     const std::vector<Coord3d>& entryCoords,
-    uint8_t type,
-    uint8_t locked,
+    Type type,
     uint8_t unknownByte01,
+    uint8_t locked,
     uint8_t lockPickable,
     uint8_t unknownByte04,
     uint8_t unknownByte05,
@@ -16,14 +16,15 @@ Door::Door(
     uint8_t unknownByte08,
     uint8_t unknownByte09,
     uint16_t unknownWord00,
-    uint16_t unknownWord01
+    uint8_t unknownByte10,
+    uint8_t unknownByte11
 )
     : m_parent(nullptr)
     , m_outlineCoords(outlineCoords)
     , m_entryCoords(entryCoords)
     , m_type(type)
-    , m_locked(locked)
     , m_unknownByte01(unknownByte01)
+    , m_locked(locked)
     , m_lockPickable(lockPickable)
     , m_unknownByte04(unknownByte04)
     , m_unknownByte05(unknownByte05)
@@ -32,7 +33,8 @@ Door::Door(
     , m_unknownByte08(unknownByte08)
     , m_unknownByte09(unknownByte09)
     , m_unknownWord00(unknownWord00)
-    , m_unknownWord01(unknownWord01)
+    , m_unknownByte10(unknownByte10)
+    , m_unknownByte11(unknownByte11)
 {
 }
 
@@ -56,19 +58,31 @@ const std::vector<Coord3d>& Door::entryCoords() const
     return m_entryCoords;
 }
 
-uint8_t Door::type() const
+Door::Type Door::type() const
 {
     return m_type;
 }
 
-uint8_t Door::locked() const
+std::string Door::typeToString() const
 {
-    return m_locked;
+    switch (m_type)
+    {
+    case Type::Invisible: return "Invisible";
+    case Type::Normal:    return "Normal";
+    case Type::Trapdoor:  return "Trapdoor";
+    case Type::Special:   return "Special";
+    default:              return "<UNKNOWN>";
+    }
 }
 
 uint8_t Door::unknownByte01() const
 {
     return m_unknownByte01;
+}
+
+uint8_t Door::locked() const
+{
+    return m_locked;
 }
 
 uint8_t Door::lockPickable() const
@@ -111,7 +125,11 @@ uint16_t Door::unknownWord00() const
     return m_unknownWord00;
 }
 
-uint16_t Door::unknownWord01() const
+uint8_t Door::unknownByte10() const
 {
-    return m_unknownWord01;
+    return m_unknownByte10;
+}
+uint8_t Door::unknownByte11() const
+{
+    return m_unknownByte11;
 }

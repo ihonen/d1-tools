@@ -3,11 +3,13 @@
 // -----------------------------------------------------------------------------
 
 Building::Building(
-    uint16_t unknownWord00,
+    uint8_t unknownByte00,
+    uint8_t unknownByte01,
     const std::vector<uint16_t>& characterIds,
     const std::vector<std::shared_ptr<Door>>& doors
 )
-    : m_unknownWord00(unknownWord00)
+    : m_unknownByte00(unknownByte00)
+    , m_unknownByte01(unknownByte01)
     , m_characterIds(characterIds)
     , m_doors(doors)
 {
@@ -17,9 +19,14 @@ Building::Building(
     }
 }
 
-uint16_t Building::unknownWord00() const
+uint8_t Building::unknownByte00() const
 {
-    return m_unknownWord00;
+    return m_unknownByte00;
+}
+
+uint8_t Building::unknownByte01() const
+{
+    return m_unknownByte01;
 }
 
 const std::vector<uint16_t>& Building::characterIds() const
