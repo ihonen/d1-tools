@@ -1,7 +1,7 @@
 #pragma once
 
-#include "level/door.hh"
-#include "level/worlditem.hh"
+#include "world/door.hh"
+#include "world/worlditem.hh"
 
 #include <memory>
 #include <vector>

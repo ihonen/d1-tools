@@ -1,6 +1,6 @@
 #pragma once
 
-#include "level/worlditem.hh"
+#include "world/worlditem.hh"
 
 #include <QGraphicsEllipseItem>
 #include <QGraphicsLineItem>

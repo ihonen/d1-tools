@@ -9,18 +9,18 @@
 class Door;
 class GraphicsItem;
 class Level;
-class MapScene;
+class LevelScene;
 class WorldItem;
 
 // -----------------------------------------------------------------------------
 
-class MapView
+class LevelView
     : public QGraphicsView
 {
     Q_OBJECT
 public:
 
-    MapView(QWidget* parent = nullptr);
+    LevelView(QWidget* parent = nullptr);
 
     void setLevel(const std::shared_ptr<Level>& level);
 
@@ -50,7 +50,7 @@ private:
 
     void mouseMoveEvent(QMouseEvent* event) override;
     
-    MapScene* m_scene = nullptr;
+    LevelScene* m_levelScene = nullptr;
     QGraphicsItem* m_mapItem = nullptr;
 
     std::vector<QGraphicsItem*> m_mapLayer;

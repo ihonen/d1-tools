@@ -3,8 +3,8 @@
 #include "file/dvd/buil.hh"
 #include "file/dvd/file.hh"
 #include "file/dvd/sector.hh"
-#include "level/map.hh"
-#include "level/minimap.hh"
+#include "world/map.hh"
+#include "world/minimap.hh"
 
 // TODO: This is dumb, but fixes a build error.
 namespace {

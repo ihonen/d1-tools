@@ -1,10 +1,10 @@
 #include "app/graphicsitem.hh"
-#include "app/mapview.hh"
-#include "app/mapscene.hh"
+#include "app/levelview.hh"
+#include "app/levelscene.hh"
 #include "common/log.hh"
 #include "image/pixel.hh"
-#include "level/level.hh"
-#include "level/map.hh"
+#include "world/level.hh"
+#include "world/map.hh"
 
 #include <QGraphicsPixmapItem>
 #include <QImage>
@@ -16,22 +16,22 @@
 
 // -----------------------------------------------------------------------------
 
-MapView::MapView(QWidget* parent)
+LevelView::LevelView(QWidget* parent)
     : QGraphicsView(parent)
 {
-    m_scene = new MapScene(this);
-    setScene(m_scene);
+    m_levelScene = new LevelScene(this);
+    setScene(m_levelScene);
 
     setStyleSheet("QGraphicsView { background: #000000; }");
 
     setMouseTracking(true);
 }
 
-void MapView::setLevel(const std::shared_ptr<Level>& level)
+void LevelView::setLevel(const std::shared_ptr<Level>& level)
 {
     m_level = level;
     
-    m_scene->clear();
+    m_levelScene->clear();
     m_worldItems.clear();
     m_graphicsItems.clear();
 
@@ -41,7 +41,7 @@ void MapView::setLevel(const std::shared_ptr<Level>& level)
     drawMap();
     drawBuildings();
 
-    m_scene->setSceneRect(
+    m_levelScene->setSceneRect(
         0,
         0,
         dynamic_cast<QGraphicsPixmapItem*>(m_mapItem)->pixmap().width(),
@@ -49,9 +49,9 @@ void MapView::setLevel(const std::shared_ptr<Level>& level)
     );
 }
 
-void MapView::drawMap()
+void LevelView::drawMap()
 {
-    const auto map = m_level->map();
+    const auto& map = m_level->map();
 
     QImage image(
         reinterpret_cast<const uchar*>(map->pixels()),
@@ -60,11 +60,11 @@ void MapView::drawMap()
         QImage::Format_BGR888
     );
 
-    m_mapItem = m_scene->addPixmap(QPixmap::fromImage(image));
+    m_mapItem = m_levelScene->addPixmap(QPixmap::fromImage(image));
     m_mapLayer.push_back(m_mapItem);
 }
 
-void MapView::drawBuildings()
+void LevelView::drawBuildings()
 {
     static const auto Pen1 = QPen(QColor{0, 0, 255}, 3);
     static const auto Pen2 = QPen(QColor{255, 0, 255}, 1);
@@ -129,7 +129,7 @@ void MapView::drawBuildings()
     */
 }
 
-void MapView::drawDoor(const std::shared_ptr<Door>& door, const QPen& pen1, const QPen& pen2, const QBrush& brush1, const QBrush& brush2)
+void LevelView::drawDoor(const std::shared_ptr<Door>& door, const QPen& pen1, const QPen& pen2, const QBrush& brush1, const QBrush& brush2)
 {
     const auto& outlineCoords = door->outlineCoords();
     for (size_t i = 0; i < outlineCoords.size(); ++i)
@@ -137,7 +137,7 @@ void MapView::drawDoor(const std::shared_ptr<Door>& door, const QPen& pen1, cons
         const auto& [x1, y1] = door->outlineCoords().at(i);
         const auto& [x2, y2] = door->outlineCoords().at(i < (outlineCoords.size() - 1) ? i + 1 : 0);
 
-        auto item = m_scene->addLine(x1, y1, x2, y2, pen1);
+        auto item = m_levelScene->addLine(x1, y1, x2, y2, pen1);
         addItem(item, door, m_buildingsLayer);
     }
 
@@ -149,35 +149,35 @@ void MapView::drawDoor(const std::shared_ptr<Door>& door, const QPen& pen1, cons
             const auto& [x1, y1, z1, z_layer1] = door->entryCoords().at(i);
             const auto& [x2, y2, z2, z_layer2] = door->entryCoords().at(i + 1);
 
-            auto item = m_scene->addLine(x1, y1, x2, y2, pen1);
+            auto item = m_levelScene->addLine(x1, y1, x2, y2, pen1);
             addItem(item, door, m_buildingsLayer);
         }
     }
 
     for (const auto& coord : outlineCoords)
     {
-        auto item4 = m_scene->addRect(coord.x - 1, coord.y - 1, 3, 3, pen2, brush2);
+        auto item4 = m_levelScene->addRect(coord.x - 1, coord.y - 1, 3, 3, pen2, brush2);
         addItem(item4, door, m_buildingsLayer);
     }
 
     for (const auto& coord : entryCoords)
     {
-        auto item4 = m_scene->addRect(coord.x - 1, coord.y - 1, 3, 3, pen2, brush2);
+        auto item4 = m_levelScene->addRect(coord.x - 1, coord.y - 1, 3, 3, pen2, brush2);
         addItem(item4, door, m_buildingsLayer);
     }
 }
 
-void MapView::setMapVisible(bool visible)
+void LevelView::setMapVisible(bool visible)
 {
      m_mapItem->setVisible(visible);
 }
 
-bool MapView::isMapVisible() const
+bool LevelView::isMapVisible() const
 {
     return m_mapItem->isVisible();
 }
 
-void MapView::setBuildingsVisible(bool visible)
+void LevelView::setBuildingsVisible(bool visible)
 {
     for (const auto& item : m_buildingsLayer)
     {
@@ -185,12 +185,12 @@ void MapView::setBuildingsVisible(bool visible)
     }
 }
 
-bool MapView::isBuildingsVisible() const
+bool LevelView::isBuildingsVisible() const
 {
     return m_buildingsLayer.size() == 0 || m_buildingsLayer.at(0)->isVisible();
 }
 
-void MapView::addItem(
+void LevelView::addItem(
     QGraphicsItem* graphicsItem,
     const std::shared_ptr<WorldItem>& worldItem,
     std::vector<QGraphicsItem*>& layer
@@ -200,12 +200,12 @@ void MapView::addItem(
     m_worldItems[graphicsItem] = worldItem;
 }
 
-void MapView::mouseMoveEvent(QMouseEvent* event)
+void LevelView::mouseMoveEvent(QMouseEvent* event)
 {
     auto pos = mapToScene(event->pos());
     emit mousePositionChanged(pos.x(), pos.y());
 
-    auto graphicsItem = m_scene->itemAt(mapToScene(event->pos()), QTransform());
+    auto graphicsItem = m_levelScene->itemAt(mapToScene(event->pos()), QTransform());
     auto worldItem = m_worldItems.find(graphicsItem);
     if (worldItem != m_worldItems.end())
     {

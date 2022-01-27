@@ -1,9 +1,9 @@
 #include "app/infoview.hh"
 #include "app/mainwindow.hh"
-#include "app/mapview.hh"
+#include "app/levelview.hh"
 #include "app/propertyview.hh"
 #include "common/log.hh"
-#include "level/level.hh"
+#include "world/level.hh"
 
 #include <QAction>
 #include <QDockWidget>
@@ -33,8 +33,8 @@ MainWindow::MainWindow()
     m_fileMenu->addAction(m_openAction);
     menuBar()->addMenu(m_fileMenu);
 
-    m_mapView = new MapView(this);
-    setCentralWidget(m_mapView);
+    m_levelView = new LevelView(this);
+    setCentralWidget(m_levelView);
 
     m_propertyDock = new QDockWidget(tr("Properties"), this);
     m_propertyDock->setAllowedAreas(Qt::RightDockWidgetArea);
@@ -58,8 +58,8 @@ MainWindow::MainWindow()
     );
 
     connect(
-        m_mapView,
-        &MapView::mousePositionChanged,
+        m_levelView,
+        &LevelView::mousePositionChanged,
         [this](auto x, auto y)
         {
             m_statusBar->showMessage(QString("%1, %2").arg(x).arg(y));
@@ -67,8 +67,8 @@ MainWindow::MainWindow()
     );
 
     connect(
-        m_mapView,
-        &MapView::worldItemHovered,
+        m_levelView,
+        &LevelView::worldItemHovered,
         m_infoView,
         &InfoView::displayWorldItem
     );
@@ -76,13 +76,13 @@ MainWindow::MainWindow()
     auto shortcut1 = new QShortcut(
         QKeySequence("F1"),
         this,
-        [this]() { m_mapView->setMapVisible(!m_mapView->isMapVisible()); }
+        [this]() { m_levelView->setMapVisible(!m_levelView->isMapVisible()); }
     );
 
     auto shortcut2 = new QShortcut(
         QKeySequence("F2"),
         this,
-        [this]() { m_mapView->setBuildingsVisible(!m_mapView->isBuildingsVisible()); }
+        [this]() { m_levelView->setBuildingsVisible(!m_levelView->isBuildingsVisible()); }
     );
 
     QSettings settings;
@@ -115,7 +115,7 @@ void MainWindow::onOpenAction()
     if (filepath.length() > 0)
     {
         m_openLevel = std::make_shared<Level>(filepath.toStdString().c_str());
-        m_mapView->setLevel(m_openLevel);
+        m_levelView->setLevel(m_openLevel);
         setWindowTitle(QString("D1 Level Editor — ") + QString::fromStdString(m_openLevel->name()));
         settings.setValue("LastOpenedDvdFile", filepath);
     }

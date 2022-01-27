@@ -2,7 +2,7 @@
 #include "common/log.hh"
 #include "file/dvd/bgnd.hh"
 #include "image/pixel.hh"
-#include "level/minimap.hh"
+#include "world/minimap.hh"
 
 #include <string>
 

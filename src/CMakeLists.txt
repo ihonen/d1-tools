@@ -3,7 +3,7 @@ if (${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
 else ()
     set(CMAKE_CXX_STANDARD 17)
 endif ()
-set(CMAKE_C_STANDARD   99)
+set(CMAKE_C_STANDARD 99)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -24,7 +24,7 @@ set(D1_INCLUDE_DIRECTORIES
 
 # ------------------------------------------------------------------------------
 
-include(qtpath.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/qtpath.cmake)
 
 find_package(Qt5Core    REQUIRED)
 find_package(Qt5Widgets REQUIRED)
@@ -39,8 +39,8 @@ add_executable(d1-level-editor
     app/infoview.cc
     app/main.cc
     app/mainwindow.cc
-    app/mapscene.cc
-    app/mapview.cc
+    app/levelscene.cc
+    app/levelview.cc
     app/propertyview.cc
     common/bzip2
     common/log.cc
@@ -50,11 +50,11 @@ add_executable(d1-level-editor
     file/dvd/sector.cc
     file/dvm/file.cc
     image/pixel.cc
-    level/building.cc
-    level/door.cc
-    level/level.cc
-    level/map.cc
-    level/minimap.cc
+    world/building.cc
+    world/door.cc
+    world/level.cc
+    world/map.cc
+    world/minimap.cc
 )
 target_include_directories(d1-level-editor
     PRIVATE ${D1_INCLUDE_DIRECTORIES}

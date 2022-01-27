@@ -1,8 +1,8 @@
 #include "common/bzip2.hh"
 #include "common/log.hh"
 #include "image/pixel.hh"
-#include "level/level.hh"
-#include "level/minimap.hh"
+#include "world/level.hh"
+#include "world/minimap.hh"
 
 #include <vector>
 

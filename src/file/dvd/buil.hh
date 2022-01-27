@@ -1,6 +1,6 @@
 #pragma once
 
-#include "level/building.hh"
+#include "world/building.hh"
 
 #include <cstdint>
 #include <memory>

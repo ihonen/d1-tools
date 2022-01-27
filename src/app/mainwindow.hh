@@ -9,7 +9,7 @@
 class Level;
 
 class InfoView;
-class MapView;
+class LevelView;
 class PropertyView;
 
 class QAction;
@@ -35,7 +35,7 @@ private:
     QMenu* m_fileMenu = nullptr;
     QAction* m_openAction = nullptr;
 
-    MapView* m_mapView = nullptr;
+    LevelView* m_levelView = nullptr;
 
     QDockWidget* m_propertyDock = nullptr;
     PropertyView* m_propertyView = nullptr;

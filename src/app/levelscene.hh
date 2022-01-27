@@ -9,7 +9,7 @@ class QGraphicsView;
 
 // -----------------------------------------------------------------------------
 
-class MapScene
+class LevelScene
     : public QGraphicsScene
 {
     Q_OBJECT

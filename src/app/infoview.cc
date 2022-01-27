@@ -1,6 +1,6 @@
 #include "app/infoview.hh"
-#include "level/building.hh"
-#include "level/door.hh"
+#include "world/building.hh"
+#include "world/door.hh"
 
 #include <QGraphicsItem>
 

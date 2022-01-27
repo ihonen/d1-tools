@@ -1,9 +1,9 @@
 #include "common/log.hh"
 #include "file/dvd/file.hh"
 #include "file/dvm/file.hh"
-#include "level/level.hh"
-#include "level/map.hh"
-#include "level/minimap.hh"
+#include "world/level.hh"
+#include "world/map.hh"
+#include "world/minimap.hh"
 
 // This fixes a build error. ._.
 namespace {

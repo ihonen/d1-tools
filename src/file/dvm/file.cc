@@ -2,7 +2,7 @@
 #include "common/log.hh"
 #include "file/dvm/file.hh"
 #include "image/pixel.hh"
-#include "level/map.hh"
+#include "world/map.hh"
 
 #include <mio/mio.hpp>
 

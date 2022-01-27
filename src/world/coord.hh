@@ -21,3 +21,4 @@ struct Coord3d
 #pragma pack(pop)
 
 static_assert(sizeof(Coord2d) == 4);
+static_assert(sizeof(Coord3d) == 8);

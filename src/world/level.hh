@@ -1,8 +1,8 @@
 #pragma once
 
-#include "level/building.hh"
-#include "level/map.hh"
-#include "level/minimap.hh"
+#include "world/building.hh"
+#include "world/map.hh"
+#include "world/minimap.hh"
 
 #include <filesystem>
 

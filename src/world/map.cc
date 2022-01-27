@@ -1,8 +1,8 @@
 #include "common/bzip2.hh"
 #include "common/log.hh"
 #include "image/pixel.hh"
-#include "level/level.hh"
-#include "level/map.hh"
+#include "world/level.hh"
+#include "world/map.hh"
 
 // TODO: This is dumb, but fixes a build error.
 namespace {
