@@ -29,7 +29,9 @@ public:
         uint8_t unknownByte06,
         uint8_t unknownByte07,
         uint8_t unknownByte08,
-        uint8_t unknownByte09
+        uint8_t unknownByte09,
+        uint16_t unknownWord00,
+        uint16_t unknownWord01
     );
 
     const std::vector<Coord2d>& outlineCoords() const;
@@ -50,6 +52,8 @@ public:
     uint8_t unknownByte07() const;
     uint8_t unknownByte08() const;
     uint8_t unknownByte09() const;
+    uint16_t unknownWord00() const;
+    uint16_t unknownWord01() const;
 
 private:
 
@@ -69,5 +73,7 @@ private:
     uint8_t m_unknownByte07;
     uint8_t m_unknownByte08;
     uint8_t m_unknownByte09;
+    uint16_t m_unknownWord00;
+    uint16_t m_unknownWord01;
 
 };

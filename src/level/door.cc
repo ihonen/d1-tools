@@ -14,7 +14,9 @@ Door::Door(
     uint8_t unknownByte06,
     uint8_t unknownByte07,
     uint8_t unknownByte08,
-    uint8_t unknownByte09
+    uint8_t unknownByte09,
+    uint16_t unknownWord00,
+    uint16_t unknownWord01
 )
     : m_parent(nullptr)
     , m_outlineCoords(outlineCoords)
@@ -29,6 +31,8 @@ Door::Door(
     , m_unknownByte07(unknownByte07)
     , m_unknownByte08(unknownByte08)
     , m_unknownByte09(unknownByte09)
+    , m_unknownWord00(unknownWord00)
+    , m_unknownWord01(unknownWord01)
 {
 }
 
@@ -100,4 +104,14 @@ uint8_t Door::unknownByte08() const
 uint8_t Door::unknownByte09() const
 {
     return m_unknownByte09;
+}
+
+uint16_t Door::unknownWord00() const
+{
+    return m_unknownWord00;
+}
+
+uint16_t Door::unknownWord01() const
+{
+    return m_unknownWord01;
 }
