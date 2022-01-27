@@ -1,4 +1,5 @@
 #include "file/dvd/buil.hh"
+#include "file/dvd/common.hh"
 
 #include <bitset>
 #include <cassert>
@@ -10,86 +11,44 @@
 namespace
 {
 
-    std::shared_ptr<Door> parseDoorEntry(const uint8_t* entryBegin, size_t* entrySizeOut)
+    std::shared_ptr<Door> consumeDoorEntry(const uint8_t** currentByte)
     {
         std::vector<Coord2d> outlineCoords;
         std::vector<Coord3d> entryCoords;
 
-        auto currentByte = entryBegin;
+        auto doorType         = consume<uint8_t>(currentByte);
+        auto unknownByte01    = consume<uint8_t>(currentByte);
+        auto locked           = consume<uint8_t>(currentByte);
+        auto lockPickable     = consume<uint8_t>(currentByte);
+        auto unknownByte04    = consume<uint8_t>(currentByte);
+        auto unknownByte05    = consume<uint8_t>(currentByte);
+        auto unknownByte06    = consume<uint8_t>(currentByte);
+        auto unknownByte07    = consume<uint8_t>(currentByte);
+        auto unknownByte08    = consume<uint8_t>(currentByte);
+        auto unknownByte09    = consume<uint8_t>(currentByte);
+        auto numOutlineCoords = consume<uint16_t>(currentByte);
 
-        auto doorType = *reinterpret_cast<const Door::Type*>(currentByte);
-        currentByte += sizeof(Door::Type);
-
-        auto unknownByte01 = *reinterpret_cast<const uint8_t*>(currentByte);
-        currentByte += sizeof(uint8_t);
-
-        auto locked = *reinterpret_cast<const uint8_t*>(currentByte);
-        currentByte += sizeof(uint8_t);
-
-        auto lockPickable = *reinterpret_cast<const uint8_t*>(currentByte);
-        currentByte += sizeof(uint8_t);
-
-        auto unknownByte04 = *reinterpret_cast<const uint8_t*>(currentByte);
-        currentByte += sizeof(uint8_t);
-
-        auto unknownByte05 = *reinterpret_cast<const uint8_t*>(currentByte);
-        currentByte += sizeof(uint8_t);
-
-        auto unknownByte06 = *reinterpret_cast<const uint8_t*>(currentByte);
-        currentByte += sizeof(uint8_t);
-        assert(doorType == Door::Type::Normal ? unknownByte06 == 0x00 : true);
-
-        auto unknownByte07 = *reinterpret_cast<const uint8_t*>(currentByte);
-        currentByte += sizeof(uint8_t);
-        assert(doorType == Door::Type::Normal ? unknownByte07 == 0x00 : true);
-
-        auto unknownByte08 = *reinterpret_cast<const uint8_t*>(currentByte);
-        currentByte += sizeof(uint8_t);
-        assert(doorType == Door::Type::Normal ? unknownByte08 == 0x00 : true);
-
-        auto unknownByte09 = *reinterpret_cast<const uint8_t*>(currentByte);
-        currentByte += sizeof(uint8_t);
-        assert(doorType == Door::Type::Normal ? unknownByte09 == 0x00 : true);
-
-        auto numOutlineCoords = *reinterpret_cast<const uint16_t*>(currentByte);
-        currentByte += sizeof(uint16_t);
-
-        for (size_t iCoord = 0; iCoord < numOutlineCoords; ++iCoord)
+        for (auto i = 0; i < numOutlineCoords; ++i)
         {
-            outlineCoords.push_back(*reinterpret_cast<const Coord2d*>(currentByte));
-            currentByte += sizeof(Coord2d);
+            outlineCoords.push_back(consume<Coord2d>(currentByte));
         }
 
-        auto numEntryCoords = *reinterpret_cast<const uint16_t*>(currentByte);
-        currentByte += sizeof(uint16_t);
+        auto numEntryCoords = consume<uint16_t>(currentByte);
         assert(numEntryCoords == 3);
 
-        for (size_t iCoord = 0; iCoord < numEntryCoords; ++iCoord)
+        for (auto i = 0; i < numEntryCoords; ++i)
         {
-            entryCoords.push_back(*reinterpret_cast<const Coord3d*>(currentByte));
-            currentByte += sizeof(Coord3d);
+            entryCoords.push_back(consume<Coord3d>(currentByte));
         }
 
-        auto unknownWord00 = *reinterpret_cast<const uint16_t*>(currentByte);
-        currentByte += sizeof(uint16_t);
-
-        uint16_t unknownByte10 = 0x00;
-        uint16_t unknownByte11 = 0x00;
-        if (unknownWord00 != 0xffff)
-        {
-            unknownByte10 = *reinterpret_cast<const uint8_t*>(currentByte);
-            currentByte += sizeof(uint8_t);
-
-            unknownByte11 = *reinterpret_cast<const uint8_t*>(currentByte);
-            currentByte += sizeof(uint8_t);
-        }
-
-        *entrySizeOut = currentByte - entryBegin;
+        auto unknownWord00 = consume<uint16_t>(currentByte);
+        auto unknownByte10 = (unknownWord00 != 0xffff) ? consume<uint8_t>(currentByte) : 0x00;
+        auto unknownByte11 = (unknownWord00 != 0xffff) ? consume<uint8_t>(currentByte) : 0x00;
 
         return std::make_shared<Door>(
             outlineCoords,
             entryCoords,
-            doorType,
+            static_cast<Door::Type>(doorType),
             unknownByte01,
             locked,
             lockPickable,
@@ -118,70 +77,54 @@ parseBuilSector(
     std::vector<std::shared_ptr<Building>> buildings;
 
     auto currentByte = firstByteOfData;
-    auto endOfData = firstByteOfData + dataSize;
+    auto endOfData   = firstByteOfData + dataSize;
 
-    auto version = *reinterpret_cast<const uint32_t*>(currentByte);
-    currentByte += sizeof(uint32_t);
-
+    auto version = consume<uint32_t>(&currentByte);
     assert(version == 4);
 
-    auto numBuildings = *reinterpret_cast<const uint16_t*>(currentByte);
-    currentByte += sizeof(uint16_t);
+    auto numBuildings = consume<uint16_t>(&currentByte);
 
-    for (size_t iBuilding = 0; iBuilding < numBuildings; ++iBuilding)
     {
-        std::vector<uint16_t> characterIds;
-        std::vector<std::shared_ptr<Door>> doors;
-
-        auto buildingUnkByte00 = *reinterpret_cast<const uint8_t*>(currentByte);
-        currentByte += sizeof(uint8_t);
-        
-        auto buildingUnkByte01 = *reinterpret_cast<const uint8_t*>(currentByte);
-        currentByte += sizeof(uint8_t);
-        assert(buildingUnkByte01 == 0x00);
-
-        auto numCharacters = *reinterpret_cast<const uint16_t*>(currentByte);
-        currentByte += sizeof(uint16_t);
-
-        for (size_t iCharacter = 0; iCharacter < numCharacters; ++iCharacter)
+        for (size_t i = 0; i < numBuildings; ++i)
         {
-            auto characterId = *reinterpret_cast<const uint16_t*>(currentByte);
-            currentByte += sizeof(uint16_t);
+            std::vector<uint16_t> characterIds;
+            std::vector<std::shared_ptr<Door>> doors;
 
-            characterIds.push_back(characterId);
+            auto unknownByte00 = consume<uint8_t>(&currentByte);
+            auto unknownByte01 = consume<uint8_t>(&currentByte);
+            auto numCharacters = consume<uint16_t>(&currentByte);
+
+            for (size_t j = 0; j < numCharacters; ++j)
+            {
+                characterIds.push_back(consume<uint16_t>(&currentByte));
+            }
+
+            auto numDoors = consume<uint16_t>(&currentByte);
+
+            for (size_t j = 0; j < numDoors; ++j)
+            {
+                doors.push_back(consumeDoorEntry(&currentByte));
+            }
+
+            assert(unknownByte01 == 0x00);
+
+            buildings.push_back(std::make_shared<Building>(
+                unknownByte00,
+                unknownByte01,
+                characterIds,
+                doors
+            ));
         }
-
-        auto numDoors = *reinterpret_cast<const uint16_t*>(currentByte);
-        currentByte += sizeof(uint16_t);
-
-        for (size_t iDoor = 0; iDoor < numDoors; ++iDoor)
-        {
-            size_t entrySize;
-            auto door = parseDoorEntry(currentByte, &entrySize);
-            doors.push_back(door);
-            currentByte += entrySize;
-        }
-
-        buildings.push_back(std::make_shared<Building>(
-            buildingUnkByte00,
-            buildingUnkByte01,
-            characterIds,
-            doors
-        ));
     }
 
     std::vector<std::shared_ptr<Door>> specialDoors;
 
     {
-        auto numSpecialDoors = *reinterpret_cast<const uint16_t*>(currentByte);
-        currentByte += sizeof(uint16_t);
+        auto numSpecialDoors = consume<uint16_t>(&currentByte);
 
-        for (size_t iSpecialDoor = 0; iSpecialDoor < numSpecialDoors; ++iSpecialDoor)
+        for (size_t i = 0; i < numSpecialDoors; ++i)
         {
-            size_t entrySize;
-            auto door = parseDoorEntry(currentByte, &entrySize);
-            specialDoors.push_back(door);
-            currentByte += entrySize;
+            specialDoors.push_back(consumeDoorEntry(&currentByte));
         }
     }
 
