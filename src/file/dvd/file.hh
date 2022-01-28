@@ -1,6 +1,7 @@
 #pragma once
 
 #include "world/building.hh"
+#include "world/material.hh"
 
 #include <filesystem>
 
@@ -22,7 +23,7 @@ public:
 
     const std::vector<std::shared_ptr<Door>>& specialDoors() const;
 
-    const std::vector<std::vector<Coord2d>>& materials() const;
+    const std::vector<std::shared_ptr<Material>>& materials() const;
 
 private:
 
@@ -35,5 +36,5 @@ private:
     std::vector<std::shared_ptr<Building>> m_buildings;
     std::vector<std::shared_ptr<Door>> m_specialDoors;
 
-    std::vector<std::vector<Coord2d>> m_materials;
+    std::vector<std::shared_ptr<Material>> m_materials;
 };

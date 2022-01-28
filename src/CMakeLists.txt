@@ -55,6 +55,7 @@ add_executable(d1-level-editor
     world/door.cc
     world/level.cc
     world/map.cc
+    world/material.cc
     world/minimap.cc
 )
 target_include_directories(d1-level-editor

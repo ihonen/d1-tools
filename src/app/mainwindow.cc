@@ -73,16 +73,22 @@ MainWindow::MainWindow()
         &InfoView::displayWorldItem
     );
 
-    auto shortcut1 = new QShortcut(
+    new QShortcut(
         QKeySequence("F1"),
         this,
         [this]() { m_levelView->setMapVisible(!m_levelView->isMapVisible()); }
     );
 
-    auto shortcut2 = new QShortcut(
+    new QShortcut(
         QKeySequence("F2"),
         this,
         [this]() { m_levelView->setBuildingsVisible(!m_levelView->isBuildingsVisible()); }
+    );
+
+    new QShortcut(
+        QKeySequence("F3"),
+        this,
+        [this]() { m_levelView->setMaterialsVisible(!m_levelView->isMaterialsVisible()); }
     );
 
     QSettings settings;

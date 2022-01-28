@@ -101,7 +101,7 @@ const std::vector<std::shared_ptr<Door>>& DvdFile::specialDoors() const
     return m_specialDoors;
 }
 
-const std::vector<std::vector<Coord2d>>& DvdFile::materials() const
+const std::vector<std::shared_ptr<Material>>& DvdFile::materials() const
 {
     return m_materials;
 }

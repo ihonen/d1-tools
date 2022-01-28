@@ -13,3 +13,9 @@ inline T consume(const uint8_t** currentByte)
     *currentByte += sizeof(T);
     return value;
 }
+
+template<typename T>
+inline T peek(const uint8_t* currentByte)
+{
+    return *reinterpret_cast<const T*>(currentByte);
+}

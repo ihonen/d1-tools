@@ -7,39 +7,35 @@
 
 // -----------------------------------------------------------------------------
 
-std::vector<std::vector<Coord2d>> parseMatSector(
+std::vector<std::shared_ptr<Material>> parseMatSector(
     const std::string levelName,
     const uint8_t* firstByteOfData,
     uint32_t dataSize
 )
 {
-    std::vector<std::vector<Coord2d>> coordSets;
+    std::vector< std::shared_ptr<Material>> materials;
 
     auto endOfData = firstByteOfData + dataSize;
     auto currentByte = firstByteOfData;
 
     auto version = consume<uint32_t>(&currentByte);
     assert(version == 4);
-    std::cout << "version = " << version << "\n";
 
     auto numSections = consume<uint16_t>(&currentByte);
-    std::cout << "numSections = " << numSections << "\n";
 
     for (auto i = 0; i < numSections; ++i)
     {
-        auto unknownWord00 = consume<uint16_t>(&currentByte);
-        std::cout << "unknownWord00 = " << unknownWord00 << "\n";
+        auto unknownByte00    = consume<uint8_t>(&currentByte);
+        auto unknownByte01    = consume<uint8_t>(&currentByte);
+        auto numMaterialZones = consume<uint16_t>(&currentByte);
 
-        auto numEntries = consume<uint16_t>(&currentByte);
-        std::cout << "numEntries = " << numEntries << "\n";
-
-        for (auto j = 0; j < numEntries; ++j)
+        for (auto j = 0; j < numMaterialZones; ++j)
         {
-            std::vector<Coord2d> coordSet;
+            std::vector<Coord2d> zoneOutlineCoords;
 
-            auto id = consume<uint8_t>(&currentByte);
+            auto zoneMaterialType = consume<uint8_t>(&currentByte);
 
-            if (id == 0x08)
+            if (zoneMaterialType == 0x08)
             {
                 for (auto k = 0; k < 2; ++k)
                 {
@@ -55,23 +51,14 @@ std::vector<std::vector<Coord2d>> parseMatSector(
             }
 
             auto numCoords = consume<uint16_t>(&currentByte);
-            std::cout << "numCoords = " << numCoords << "\n";
             for (auto k = 0; k < numCoords; ++k)
             {
-                coordSet.push_back(consume<Coord2d>(&currentByte));
-                std::cout << std::hex << std::setw(4) << std::setfill('0') << coordSet.back().x << ", " << std::setw(4) << coordSet.back().y << "\n";
+                zoneOutlineCoords.push_back(consume<Coord2d>(&currentByte));
             }
-            coordSets.push_back(coordSet);
-        }  
+
+            materials.push_back(std::make_shared<Material>(zoneOutlineCoords, zoneMaterialType));
+        }
     }
 
-    /*
-    while (currentByte < endOfData)
-    {
-        std::cout << std::hex << std::setfill('0') << std::setw(2) << int(consume<uint8_t>(&currentByte)) << "\n";
-        //std::cout << int(consume<uint16_t>(&currentByte)) << "\n";
-    }
-    */
-
-    return coordSets;
+    return materials;
 }

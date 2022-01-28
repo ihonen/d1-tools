@@ -37,6 +37,7 @@ void LevelView::setLevel(const std::shared_ptr<Level>& level)
 
     m_mapLayer.clear();
     m_buildingsLayer.clear();
+    m_materialsLayer.clear();
 
     drawMap();
     drawBuildings();
@@ -129,26 +130,63 @@ void LevelView::drawDoor(const std::shared_ptr<Door>& door, const QPen& pen1, co
 
 void LevelView::drawMaterials()
 {
+    static const QPen BrushPen = QPen(QColor{ 1, 193, 113 }, 3);
+    static const QPen GrassPen = QPen(QColor{ 0, 175, 225 }, 3);
+    static const QPen LightPen = QPen(QColor{ 255, 255, 0 }, 3);
+    static const QPen WaterPen = QPen(QColor{ 168, 199, 31 }, 3);
+    static const QPen WoodPen = QPen(QColor{ 241, 55, 100 }, 3);
+
+    static const QPen DefaultPen = QPen(QColor{255, 0, 0}, 3);
+    
     for (const auto& material : m_level->materials())
     {
-        for (size_t i = 0; i < material.size(); ++i)
+        switch (material->unknownByte00())
         {
-            const auto& [x1, y1] = material.at(i);
-            const auto& [x2, y2] = material.at(i < (material.size() - 1) ? i + 1 : 0);
-
-            auto item = m_levelScene->addLine(x1, y1, x2, y2, QPen(QColor{0, 175, 225}, 2));
+        case 0x01:
+            drawMaterial(material, WoodPen);
+            break;
+        case 0x03:
+            drawMaterial(material, GrassPen);
+            break;
+        case 0x05:
+            drawMaterial(material, WaterPen);
+            break;
+        case 0x06:
+            drawMaterial(material, BrushPen);
+            break;
+        case 0x08:
+            drawMaterial(material, LightPen);
+            break;
+        default:
+            drawMaterial(material, DefaultPen);
         }
+    }
+}
+
+void LevelView::drawMaterial(const std::shared_ptr<Material>& material, const QPen& pen)
+{
+    const auto& area = material->area();
+    for (size_t i = 0; i < area.size(); ++i)
+    {
+        const auto& [x1, y1] = area.at(i);
+        const auto& [x2, y2] = area.at(i < (area.size() - 1) ? i + 1 : 0);
+
+        auto item = m_levelScene->addLine(x1, y1, x2, y2, pen);
+        addItem(item, material, m_materialsLayer);
     }
 }
 
 void LevelView::setMapVisible(bool visible)
 {
-     m_mapItem->setVisible(visible);
+    for (const auto& item : m_mapLayer)
+    {
+        item->setVisible(visible);
+    }
 }
 
 bool LevelView::isMapVisible() const
 {
-    return m_mapItem->isVisible();
+    return m_mapLayer.empty() || m_mapLayer.at(0)->isVisible();
 }
 
 void LevelView::setBuildingsVisible(bool visible)
@@ -161,7 +199,20 @@ void LevelView::setBuildingsVisible(bool visible)
 
 bool LevelView::isBuildingsVisible() const
 {
-    return m_buildingsLayer.size() == 0 || m_buildingsLayer.at(0)->isVisible();
+    return m_buildingsLayer.empty() || m_buildingsLayer.at(0)->isVisible();
+}
+
+void LevelView::setMaterialsVisible(bool visible)
+{
+    for (const auto& item : m_materialsLayer)
+    {
+        item->setVisible(visible);
+    }
+}
+
+bool LevelView::isMaterialsVisible() const
+{
+    return m_materialsLayer.empty() || m_materialsLayer.at(0)->isVisible();
 }
 
 void LevelView::addItem(

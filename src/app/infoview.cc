@@ -1,6 +1,7 @@
 #include "app/infoview.hh"
 #include "world/building.hh"
 #include "world/door.hh"
+#include "world/material.hh"
 
 #include <QGraphicsItem>
 
@@ -73,6 +74,16 @@ void InfoView::displayWorldItem(const std::shared_ptr<WorldItem>& worldItem)
                 text << "  " << id << "\n";
             }
         }
+
+        append(QString::fromStdString(text.str()));
+    }
+    else if (auto material = dynamic_cast<Material*>(worldItem.get()))
+    {
+        std::ostringstream text;
+
+        text
+            << "MATERIAL\n"
+            << "unknownByte00: " << int(material->unknownByte00()) << "\n";
 
         append(QString::fromStdString(text.str()));
     }

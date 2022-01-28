@@ -55,7 +55,7 @@ const std::vector<std::shared_ptr<Door>>& Level::specialDoors() const
     return m_specialDoors;
 }
 
-const std::vector<std::vector<Coord2d>> Level::materials() const
+const std::vector<std::shared_ptr<Material>>& Level::materials() const
 {
     return m_materials;
 }

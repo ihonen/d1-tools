@@ -10,6 +10,7 @@ class Door;
 class GraphicsItem;
 class Level;
 class LevelScene;
+class Material;
 class WorldItem;
 
 // -----------------------------------------------------------------------------
@@ -30,6 +31,9 @@ public:
     void setBuildingsVisible(bool visible);
     bool isBuildingsVisible() const;
 
+    void setMaterialsVisible(bool visible);
+    bool isMaterialsVisible() const;
+
 signals:
 
     void mousePositionChanged(int x, int y);
@@ -49,6 +53,7 @@ private:
     void drawDoor(const std::shared_ptr<Door>& door, const QPen& pen1, const QPen& pen2, const QBrush& brush1, const QBrush& brush2);
 
     void drawMaterials();
+    void drawMaterial(const std::shared_ptr<Material>& material, const QPen& pen);
 
     void mouseMoveEvent(QMouseEvent* event) override;
     
@@ -57,6 +62,7 @@ private:
 
     std::vector<QGraphicsItem*> m_mapLayer;
     std::vector<QGraphicsItem*> m_buildingsLayer;
+    std::vector<QGraphicsItem*> m_materialsLayer;
 
     std::map<QGraphicsItem*, std::shared_ptr<WorldItem>> m_worldItems;
     std::map<std::shared_ptr<WorldItem>, QGraphicsItem*> m_graphicsItems;

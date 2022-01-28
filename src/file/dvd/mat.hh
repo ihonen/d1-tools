@@ -1,14 +1,15 @@
 #pragma once
 
-#include "world/coord.hh"
+#include "world/material.hh"
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
 // ---------------------------------------------------------------------------
 
-std::vector<std::vector<Coord2d>> parseMatSector(
+std::vector< std::shared_ptr<Material>> parseMatSector(
     const std::string levelName,
     const uint8_t* firstByteOfData,
     uint32_t dataSize
