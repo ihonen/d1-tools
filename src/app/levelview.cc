@@ -138,41 +138,42 @@ void LevelView::drawMaterials()
 
     static const QPen DefaultPen = QPen(QColor{255, 0, 0}, 3);
     
-    for (const auto& material : m_level->materials())
+    for (const auto& materialZone : m_level->materialZones())
     {
-        switch (material->unknownByte00())
+        switch (materialZone->type())
         {
-        case 0x01:
-            drawMaterial(material, WoodPen);
+        case MaterialZone::Type::Wood:
+            drawMaterial(materialZone, WoodPen);
             break;
-        case 0x03:
-            drawMaterial(material, GrassPen);
+        case MaterialZone::Type::Grass:
+            drawMaterial(materialZone, GrassPen);
             break;
-        case 0x05:
-            drawMaterial(material, WaterPen);
+        case MaterialZone::Type::Water:
+            drawMaterial(materialZone, WaterPen);
             break;
-        case 0x06:
-            drawMaterial(material, BrushPen);
+        case MaterialZone::Type::Brush:
+            drawMaterial(materialZone, BrushPen);
             break;
-        case 0x08:
-            drawMaterial(material, LightPen);
+        case MaterialZone::Type::Light:
+            drawMaterial(materialZone, LightPen);
             break;
         default:
-            drawMaterial(material, DefaultPen);
+            drawMaterial(materialZone, DefaultPen);
+            break;
         }
     }
 }
 
-void LevelView::drawMaterial(const std::shared_ptr<Material>& material, const QPen& pen)
+void LevelView::drawMaterial(const std::shared_ptr<MaterialZone>& materialZone, const QPen& pen)
 {
-    const auto& area = material->area();
+    const auto& area = materialZone->outlineCoords();
     for (size_t i = 0; i < area.size(); ++i)
     {
         const auto& [x1, y1] = area.at(i);
         const auto& [x2, y2] = area.at(i < (area.size() - 1) ? i + 1 : 0);
 
         auto item = m_levelScene->addLine(x1, y1, x2, y2, pen);
-        addItem(item, material, m_materialsLayer);
+        addItem(item, materialZone, m_materialsLayer);
     }
 }
 

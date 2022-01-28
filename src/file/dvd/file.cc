@@ -68,11 +68,12 @@ DvdFile::DvdFile(const std::filesystem::path& path)
             break;
         case DvdSector::Mat:
             Log::debug() << "Loading sector MAT\n" << std::flush;
-            m_materials = parseMatSector(
+            m_materialZones = parseMatSector(
                 m_levelName,
                 sectorData,
                 sectorHeader->sectorDataSize
             );
+            break;
         default:
             Log::warning()
                 << "Skipping sector "
@@ -101,7 +102,7 @@ const std::vector<std::shared_ptr<Door>>& DvdFile::specialDoors() const
     return m_specialDoors;
 }
 
-const std::vector<std::shared_ptr<Material>>& DvdFile::materials() const
+const std::vector<std::shared_ptr<MaterialZone>>& DvdFile::materialZones() const
 {
-    return m_materials;
+    return m_materialZones;
 }

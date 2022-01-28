@@ -44,9 +44,11 @@ MainWindow::MainWindow()
     addDockWidget(Qt::RightDockWidgetArea, m_propertyDock);
 
     m_logDock = new QDockWidget(tr(""), this);
+    m_logDock->setObjectName("logDock");
     m_logDock->setAllowedAreas(Qt::LeftDockWidgetArea);
     m_logDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
     m_infoView = new InfoView(m_logDock);
+    m_infoView->setObjectName("infoView");
     m_logDock->setWidget(m_infoView);
     addDockWidget(Qt::LeftDockWidgetArea, m_logDock);
 
@@ -90,7 +92,10 @@ MainWindow::MainWindow()
         this,
         [this]() { m_levelView->setMaterialsVisible(!m_levelView->isMaterialsVisible()); }
     );
+}
 
+void MainWindow::showEvent(QShowEvent* event)
+{
     QSettings settings;
     restoreGeometry(settings.value("MainWindow/geometry").toByteArray());
     restoreState(settings.value("MainWindow/state").toByteArray());

@@ -9,7 +9,7 @@
 
 // ---------------------------------------------------------------------------
 
-std::vector< std::shared_ptr<Material>> parseMatSector(
+std::vector< std::shared_ptr<MaterialZone>> parseMatSector(
     const std::string levelName,
     const uint8_t* firstByteOfData,
     uint32_t dataSize

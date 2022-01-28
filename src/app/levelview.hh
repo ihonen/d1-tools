@@ -10,7 +10,7 @@ class Door;
 class GraphicsItem;
 class Level;
 class LevelScene;
-class Material;
+class MaterialZone;
 class WorldItem;
 
 // -----------------------------------------------------------------------------
@@ -53,7 +53,7 @@ private:
     void drawDoor(const std::shared_ptr<Door>& door, const QPen& pen1, const QPen& pen2, const QBrush& brush1, const QBrush& brush2);
 
     void drawMaterials();
-    void drawMaterial(const std::shared_ptr<Material>& material, const QPen& pen);
+    void drawMaterial(const std::shared_ptr<MaterialZone>& material, const QPen& pen);
 
     void mouseMoveEvent(QMouseEvent* event) override;
     
