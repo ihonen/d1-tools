@@ -2,6 +2,7 @@
 #include "file/dvd/bgnd.hh"
 #include "file/dvd/buil.hh"
 #include "file/dvd/file.hh"
+#include "file/dvd/mat.hh"
 #include "file/dvd/sector.hh"
 #include "world/map.hh"
 #include "world/minimap.hh"
@@ -65,6 +66,13 @@ DvdFile::DvdFile(const std::filesystem::path& path)
                 sectorHeader->sectorDataSize
             );
             break;
+        case DvdSector::Mat:
+            Log::debug() << "Loading sector MAT\n" << std::flush;
+            m_materials = parseMatSector(
+                m_levelName,
+                sectorData,
+                sectorHeader->sectorDataSize
+            );
         default:
             Log::warning()
                 << "Skipping sector "
@@ -91,4 +99,9 @@ const std::vector<std::shared_ptr<Building>>& DvdFile::buildings() const
 const std::vector<std::shared_ptr<Door>>& DvdFile::specialDoors() const
 {
     return m_specialDoors;
+}
+
+const std::vector<std::vector<Coord2d>>& DvdFile::materials() const
+{
+    return m_materials;
 }

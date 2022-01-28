@@ -48,6 +48,8 @@ private:
     void drawBuildings();
     void drawDoor(const std::shared_ptr<Door>& door, const QPen& pen1, const QPen& pen2, const QBrush& brush1, const QBrush& brush2);
 
+    void drawMaterials();
+
     void mouseMoveEvent(QMouseEvent* event) override;
     
     LevelScene* m_levelScene = nullptr;

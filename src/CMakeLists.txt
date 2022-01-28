@@ -47,6 +47,7 @@ add_executable(d1-level-editor
     file/dvd/bgnd.cc
     file/dvd/buil.cc
     file/dvd/file.cc
+    file/dvd/mat.cc
     file/dvd/sector.cc
     file/dvm/file.cc
     image/pixel.cc

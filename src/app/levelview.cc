@@ -40,6 +40,7 @@ void LevelView::setLevel(const std::shared_ptr<Level>& level)
 
     drawMap();
     drawBuildings();
+    drawMaterials();
 
     m_levelScene->setSceneRect(
         0,
@@ -86,47 +87,6 @@ void LevelView::drawBuildings()
     {
         drawDoor(door, Pen3, Pen2, Brush3, Brush2);
     }
-
-
-    /*
-    for (const auto& specialDoor : m_level->specialDoors())
-    {
-        const auto& outlineCoords = specialDoor->outlineCoords();
-        for (size_t i = 0; i < outlineCoords.size(); ++i)
-        {
-            const auto& [x1, y1] = specialDoor->outlineCoords().at(i);
-            const auto& [x2, y2] = specialDoor->outlineCoords().at(i < (outlineCoords.size() - 1) ? i + 1 : 0);
-
-            auto item = m_scene->addLine(x1, y1, x2, y2, Pen3);
-            addItem(item, specialDoor, m_buildingsLayer);
-        }
-
-        const auto& entryCoords = specialDoor->entryCoords();
-        if (entryCoords.size() >= 2)
-        {
-            for (size_t i = 0; i < entryCoords.size() - 1; ++i)
-            {
-                const auto& [x1, y1, z1, z_layer1] = specialDoor->entryCoords().at(i);
-                const auto& [x2, y2, z2, z_layer2] = specialDoor->entryCoords().at(i + 1);
-
-                auto item = m_scene->addLine(x1, y1, x2, y2, Pen3);
-                addItem(item, specialDoor, m_buildingsLayer);
-            }
-        }
-
-        for (const auto& coord : outlineCoords)
-        {
-            auto item4 = m_scene->addRect(coord.x - 1, coord.y - 1, 3, 3, Pen2, Brush2);
-            addItem(item4, specialDoor, m_buildingsLayer);
-        }
-
-        for (const auto& coord : entryCoords)
-        {
-            auto item4 = m_scene->addRect(coord.x - 1, coord.y - 1, 3, 3, Pen2, Brush2);
-            addItem(item4, specialDoor, m_buildingsLayer);
-        }
-    }
-    */
 }
 
 void LevelView::drawDoor(const std::shared_ptr<Door>& door, const QPen& pen1, const QPen& pen2, const QBrush& brush1, const QBrush& brush2)
@@ -164,6 +124,20 @@ void LevelView::drawDoor(const std::shared_ptr<Door>& door, const QPen& pen1, co
     {
         auto item4 = m_levelScene->addRect(coord.x - 1, coord.y - 1, 3, 3, pen2, brush2);
         addItem(item4, door, m_buildingsLayer);
+    }
+}
+
+void LevelView::drawMaterials()
+{
+    for (const auto& material : m_level->materials())
+    {
+        for (size_t i = 0; i < material.size(); ++i)
+        {
+            const auto& [x1, y1] = material.at(i);
+            const auto& [x2, y2] = material.at(i < (material.size() - 1) ? i + 1 : 0);
+
+            auto item = m_levelScene->addLine(x1, y1, x2, y2, QPen(QColor{0, 175, 225}, 2));
+        }
     }
 }
 
