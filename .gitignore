@@ -35,7 +35,11 @@
 
 ./.vs
 ./.vscode
-./build
-./build-*
-./.build
-./.build-*
+build
+build-*
+.build
+.build-*
+install
+install-*
+.install
+.install-*

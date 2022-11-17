@@ -1,1 +1,2 @@
-add_subdirectory(file-extractor)
+add_subdirectory(data-compiler)
+add_subdirectory(data-extractor)
