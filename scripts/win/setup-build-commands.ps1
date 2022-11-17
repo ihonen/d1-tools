@@ -10,13 +10,13 @@ function Configure
 function Build-Debug
 {
     Configure
-    cmake --build "$BUILD_DIR" --parallel --config "Debug"
+    cmake --build "$BUILD_DIR" --config "Debug" --parallel "$NUM_CPU_CORES"
 }
 
 function Build-Release
 {
     Configure
-    cmake --build "$BUILD_DIR" --parallel --config "Release"
+    cmake --build "$BUILD_DIR" --config "Release" --parallel "$NUM_CPU_CORES"
 }
 
 function Install-Debug

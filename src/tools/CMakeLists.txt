@@ -1,2 +1,1 @@
-add_subdirectory(data-compiler)
-add_subdirectory(data-extractor)
+add_subdirectory(level-viewer)

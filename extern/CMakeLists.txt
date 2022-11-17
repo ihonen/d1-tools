@@ -1,0 +1,22 @@
+# ------------------------------------------------------------------------------
+# bzip2
+# ------------------------------------------------------------------------------
+
+set(ENABLE_LIB_ONLY    ON CACHE INTERNAL "" FORCE)
+set(ENABLE_STATIC_LIB  ON CACHE INTERNAL "" FORCE)
+set(ENABLE_SHARED_LIB OFF CACHE INTERNAL "" FORCE)
+set(ENABLE_APP        OFF CACHE INTERNAL "" FORCE)
+
+add_subdirectory(bzip2)
+
+# Make sure that these don't conflict with something else:
+unset(ENABLE_LIB_ONLY)
+unset(ENABLE_STATIC_LIB)
+unset(ENABLE_SHARED_LIB)
+unset(ENABLE_APP)
+
+# ------------------------------------------------------------------------------
+# mio
+# ------------------------------------------------------------------------------
+
+add_subdirectory(mio)

@@ -13,4 +13,14 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 # ------------------------------------------------------------------------------
 
+add_subdirectory(extern)
+
+include_directories(
+    extern
+    extern/bzip2
+    extern/mio/single_include
+)
+
+# ------------------------------------------------------------------------------
+
 add_subdirectory(src)

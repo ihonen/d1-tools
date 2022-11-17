@@ -1,0 +1,6 @@
+[submodule "extern/bzip2"]
+	path = extern/bzip2
+	url = https://gitlab.com/bzip2/bzip2.git
+[submodule "extern/mio"]
+	path = extern/mio
+	url = https://github.com/mandreyel/mio.git

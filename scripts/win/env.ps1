@@ -1,4 +1,11 @@
 Set-Variable -Name GAME_DIR            -Value "C:\Program Files (x86)\Steam\steamapps\common\Desperados Wanted Dead or Alive"
+
+Set-Variable -Name NUM_CPU_CORES       -Value "16"
+
+# ------------------------------------------------------------------------------
+
+$Env:QT_DIR = "C:/Qt/5.15.2/msvc2019_64/lib/cmake"
+
 Set-Variable -Name PROJECT_DIR         -Value "$(Join-Path "$PSScriptRoot" "..\.." -Resolve)"
 
 # ------------------------------------------------------------------------------
