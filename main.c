@@ -72,10 +72,248 @@ static void extractSector_BOND(FILE* in, FILE* out, u32 size)
 static void extractSector_BUIL(FILE* in, FILE* out, u32 size)
 {
     printf("Extracting sector BUIL (%uB)\n", (unsigned)size);
-    u8* data = malloc(size);
-    fread(data, 1, size, in);
-    fwrite(data, 1, size, out);
-    free(data);
+
+    fprintf(out, "---\n");
+
+    u32 version;
+    fread(&version, sizeof(u32), 1, in);
+    assert(version == 0x04);
+
+    fprintf(out, "version: %u\n", (unsigned)version);
+
+    fprintf(out, "buildings:\n");
+
+    u16 num_buildings;
+    fread(&num_buildings, sizeof(u16), 1, in);
+
+    for (u16 i_building = 0; i_building < num_buildings; ++i_building)
+    {
+        u8 u8_01;
+        fread(&u8_01, sizeof(u8), 1, in);
+        fprintf(out, "  - u8_01: %u\n", (unsigned)u8_01);
+
+        u8 u8_02;
+        fread(&u8_02, sizeof(u8), 1, in);
+        fprintf(out, "    u8_02: %u\n", (unsigned)u8_02);
+
+        fprintf(out, "    occupants:\n");
+        
+        u16 num_occupants;
+        fread(&num_occupants, sizeof(u16), 1, in);
+
+        for (u16 i_occupant = 0; i_occupant < num_occupants; ++i_occupant)
+        {
+            u16 occupant_id;
+            fread(&occupant_id, sizeof(u16), 1, in);
+            fprintf(out, "     - %u\n", (unsigned)occupant_id);
+        }
+
+        fprintf(out, "    doors:\n");
+
+        u16 num_doors;
+        fread(&num_doors, sizeof(u16), 1, in);
+
+        for (u16 i_door = 0; i_door < num_doors; ++i_door)
+        {
+            u8 type;
+            fread(&type, sizeof(u8), 1, in);
+            fprintf(out, "      - type: %u\n", (unsigned)type);
+
+            u8 u8_05;
+            fread(&u8_05, sizeof(u8), 1, in);
+            fprintf(out, "        u8_05: %u\n", (unsigned)u8_05);
+
+            u8 locked;
+            fread(&locked, sizeof(u8), 1, in);
+            fprintf(out, "        locked: %u\n", (unsigned)locked);
+
+            u8 lockpickable;
+            fread(&lockpickable, sizeof(u8), 1, in);
+            fprintf(out, "        lockpickable: %u\n", (unsigned)lockpickable);
+
+            u8 u8_06;
+            fread(&u8_06, sizeof(u8), 1, in);
+            fprintf(out, "        u8_06: %u\n", (unsigned)u8_06);
+
+            u8 u8_07;
+            fread(&u8_07, sizeof(u8), 1, in);
+            fprintf(out, "        u8_07: %u\n", (unsigned)u8_07);
+
+            u8 u8_08;
+            fread(&u8_08, sizeof(u8), 1, in);
+            fprintf(out, "        u8_08: %u\n", (unsigned)u8_08);
+
+            u8 u8_09;
+            fread(&u8_09, sizeof(u8), 1, in);
+            fprintf(out, "        u8_09: %u\n", (unsigned)u8_09);
+
+            u8 u8_10;
+            fread(&u8_10, sizeof(u8), 1, in);
+            fprintf(out, "        u8_10: %u\n", (unsigned)u8_10);
+
+            u8 u8_11;
+            fread(&u8_11, sizeof(u8), 1, in);
+            fprintf(out, "        u8_11: %u\n", (unsigned)u8_11);
+
+            fprintf(out, "        frame:\n");
+
+            u16 num_frame_coords;
+            fread(&num_frame_coords, sizeof(u16), 1, in);
+
+            for (u16 i_frame_coord = 0; i_frame_coord < num_frame_coords; ++i_frame_coord)
+            {
+                u16 x;
+                fread(&x, sizeof(u16), 1, in);
+                fprintf(out, "        - x: %u\n", (unsigned)x);
+
+                u16 y;
+                fread(&y, sizeof(u16), 1, in);
+                fprintf(out, "          y: %u\n", (unsigned)y);
+            }
+
+            fprintf(out, "        access:\n");
+
+            u16 num_access_coords;
+            fread(&num_access_coords, sizeof(u16), 1, in);
+
+            for (u16 i_access_coord = 0; i_access_coord < num_access_coords; ++i_access_coord)
+            {
+                u16 x;
+                fread(&x, sizeof(u16), 1, in);
+                fprintf(out, "        - x: %u\n", (unsigned)x);
+
+                u16 y;
+                fread(&y, sizeof(u16), 1, in);
+                fprintf(out, "          y: %u\n", (unsigned)y);
+
+                u16 z;
+                fread(&z, sizeof(u16), 1, in);
+                fprintf(out, "          z: %u\n", (unsigned)z);
+
+                u16 elevation;
+                fread(&elevation, sizeof(u16), 1, in);
+                fprintf(out, "          elevation: %u\n", (unsigned)elevation);
+            }
+
+            u16 u16_01;
+            fread(&u16_01, sizeof(u16), 1, in);
+            fprintf(out, "        u16_01: %u\n", (unsigned)u16_01);
+
+            if (u16_01 != 0xffff)
+            {
+                u8 u8_12;
+                fread(&u8_12, sizeof(u8), 1, in);
+                fprintf(out, "        - u8_12: %u\n", (unsigned)u8_12);
+
+                u8 u8_13;
+                fread(&u8_13, sizeof(u8), 1, in);
+                fprintf(out, "        - u8_13: %u\n", (unsigned)u8_13);
+            }
+        }
+    }
+
+    fprintf(out, "special_doors:\n");
+
+    u16 num_special_doors;
+    fread(&num_special_doors, sizeof(u16), 1, in);
+
+    for (u16 i_special_door = 0; i_special_door < num_special_doors; ++i_special_door)
+    {
+        u8 type;
+        fread(&type, sizeof(u8), 1, in);
+        fprintf(out, " - type: %u\n", (unsigned)type);
+
+        u8 u8_05;
+        fread(&u8_05, sizeof(u8), 1, in);
+        fprintf(out, "    u8_05: %u\n", (unsigned)u8_05);
+
+        u8 locked;
+        fread(&locked, sizeof(u8), 1, in);
+        fprintf(out, "    locked: %u\n", (unsigned)locked);
+
+        u8 lockpickable;
+        fread(&lockpickable, sizeof(u8), 1, in);
+        fprintf(out, "    lockpickable: %u\n", (unsigned)lockpickable);
+
+        u8 u8_06;
+        fread(&u8_06, sizeof(u8), 1, in);
+        fprintf(out, "    u8_06: %u\n", (unsigned)u8_06);
+
+        u8 u8_07;
+        fread(&u8_07, sizeof(u8), 1, in);
+        fprintf(out, "    u8_07: %u\n", (unsigned)u8_07);
+
+        u8 u8_08;
+        fread(&u8_08, sizeof(u8), 1, in);
+        fprintf(out, "    u8_08: %u\n", (unsigned)u8_08);
+
+        u8 u8_09;
+        fread(&u8_09, sizeof(u8), 1, in);
+        fprintf(out, "    u8_09: %u\n", (unsigned)u8_09);
+
+        u8 u8_10;
+        fread(&u8_10, sizeof(u8), 1, in);
+        fprintf(out, "    u8_10: %u\n", (unsigned)u8_10);
+
+        u8 u8_11;
+        fread(&u8_11, sizeof(u8), 1, in);
+        fprintf(out, "    u8_11: %u\n", (unsigned)u8_11);
+
+        fprintf(out, "    frame:\n");
+
+        u16 num_frame_coords;
+        fread(&num_frame_coords, sizeof(u16), 1, in);
+
+        for (u16 i_frame_coord = 0; i_frame_coord < num_frame_coords; ++i_frame_coord)
+        {
+            u16 x;
+            fread(&x, sizeof(u16), 1, in);
+            fprintf(out, "    - x: %u\n", (unsigned)x);
+
+            u16 y;
+            fread(&y, sizeof(u16), 1, in);
+            fprintf(out, "      y: %u\n", (unsigned)y);
+        }
+
+        fprintf(out, "    access:\n");
+
+        u16 num_access_coords;
+        fread(&num_access_coords, sizeof(u16), 1, in);
+
+        for (u16 i_access_coord = 0; i_access_coord < num_access_coords; ++i_access_coord)
+        {
+            u16 x;
+            fread(&x, sizeof(u16), 1, in);
+            fprintf(out, "    - x: %u\n", (unsigned)x);
+
+            u16 y;
+            fread(&y, sizeof(u16), 1, in);
+            fprintf(out, "      y: %u\n", (unsigned)y);
+
+            u16 z;
+            fread(&z, sizeof(u16), 1, in);
+            fprintf(out, "      z: %u\n", (unsigned)z);
+
+            u16 elevation;
+            fread(&elevation, sizeof(u16), 1, in);
+            fprintf(out, "      elevation: %u\n", (unsigned)elevation);
+        }
+
+        u16 u16_01;
+        fread(&u16_01, sizeof(u16), 1, in);
+        fprintf(out, "    u16_01: %u\n", (unsigned)u16_01);
+
+        if (u16_01 != 0xffff)
+        {
+            u8 u8_03;
+            fread(&u8_03, sizeof(u8), 1, in);
+            fprintf(out, "    - u8_03: %u\n", (unsigned)u8_03);
+
+            u8 u8_04;
+            fread(&u8_04, sizeof(u8), 1, in);
+            fprintf(out, "    - u8_02: %u\n", (unsigned)u8_04);
+        }
+    }
 }
 
 static void extractSector_CART(FILE* in, FILE* out, u32 size)
@@ -388,7 +626,7 @@ int main(int argc, char* argv[])
             break;
         case 0x4C495542:
             dumpSector(in, sector_size, "BUIL.dump.bin");
-            out = fopen("BUIL", "wb");
+            out = fopen("BUIL.yaml", "wb");
             extractSector_BUIL(in, out, sector_size);
             fclose(out);
             break;
