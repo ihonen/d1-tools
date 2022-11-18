@@ -1,5 +1,4 @@
 Set-Variable -Name GAME_DIR            -Value "C:\Program Files (x86)\Steam\steamapps\common\Desperados Wanted Dead or Alive"
-
 Set-Variable -Name NUM_CPU_CORES       -Value "16"
 
 # ------------------------------------------------------------------------------
