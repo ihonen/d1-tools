@@ -63,10 +63,50 @@ static void extractSector_BGND(FILE* in, FILE* out, u32 size)
 static void extractSector_BOND(FILE* in, FILE* out, u32 size)
 {
     printf("Extracting sector BOND (%uB)\n", (unsigned)size);
-    u8* data = malloc(size);
-    fread(data, 1, size, in);
-    fwrite(data, 1, size, out);
-    free(data);
+
+    fprintf(out, "---\n");
+
+    u32 version;
+    fread(&version, sizeof(u32), 1, in);
+    assert(version == 0x02);
+
+    fprintf(out, "version: %u\n", (unsigned)version);
+
+    fprintf(out, "entries:\n");
+
+    u16 num_entries;
+    fread(&num_entries, sizeof(u16), 1, in);
+
+    for (u16 i_entry = 0; i_entry < num_entries; ++i_entry)
+    {
+        u16 x1;
+        fread(&x1, sizeof(u16), 1, in);
+        fprintf(out, "    x1: %u\n", (unsigned)x1);
+
+        u16 y1;
+        fread(&y1, sizeof(u16), 1, in);
+        fprintf(out, "    y1: %u\n", (unsigned)y1);
+
+        u16 x2;
+        fread(&x2, sizeof(u16), 1, in);
+        fprintf(out, "    x2: %u\n", (unsigned)x2);
+
+        u16 y2;
+        fread(&y2, sizeof(u16), 1, in);
+        fprintf(out, "    y2: %u\n", (unsigned)y2);
+
+        u16 u16_01;
+        fread(&u16_01, sizeof(u16), 1, in);
+        fprintf(out, "    u16_01: %u\n", (unsigned)u16_01);
+
+        u16 u16_02;
+        fread(&u16_02, sizeof(u16), 1, in);
+        fprintf(out, "    u16_02: %u\n", (unsigned)u16_02);
+
+        u16 u16_03;
+        fread(&u16_03, sizeof(u16), 1, in);
+        fprintf(out, "    u16_03: %u\n", (unsigned)u16_03);
+    }
 }
 
 static void extractSector_BUIL(FILE* in, FILE* out, u32 size)
@@ -670,7 +710,7 @@ int main(int argc, char* argv[])
             break;
         case 0x444E4F42:
             dumpSector(in, sector_size, "BOND.dump.bin");
-            out = fopen("BOND", "wb");
+            out = fopen("BOND.yaml", "wb");
             extractSector_BOND(in, out, sector_size);
             fclose(out);
             break;
