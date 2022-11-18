@@ -221,7 +221,7 @@ static void extractSector_BUIL(FILE* in, FILE* out, u32 size)
     {
         u8 type;
         fread(&type, sizeof(u8), 1, in);
-        fprintf(out, " - type: %u\n", (unsigned)type);
+        fprintf(out, "  - type: %u\n", (unsigned)type);
 
         u8 u8_05;
         fread(&u8_05, sizeof(u8), 1, in);
@@ -548,10 +548,60 @@ static void extractSector_PAT(FILE* in, FILE* out, u32 size)
 static void extractSector_SCRP(FILE* in, FILE* out, u32 size)
 {
     printf("Extracting sector SCRP (%uB)\n", (unsigned)size);
-    u8* data = malloc(size);
-    fread(data, 1, size, in);
-    fwrite(data, 1, size, out);
-    free(data);
+
+    fprintf(out, "---\n");
+
+    u32 version;
+    fread(&version, sizeof(u32), 1, in);
+    assert(version == 0x01);
+
+    fprintf(out, "version: %u\n", (unsigned)version);
+
+    fprintf(out, "locations:\n");
+
+    u16 num_entries;
+    fread(&num_entries, sizeof(u16), 1, in);
+
+    for (u16 i_entry = 0; i_entry < num_entries; ++i_entry)
+    {
+        fprintf(out, "  - coords:\n");
+
+        u16 num_coords;
+        fread(&num_coords, sizeof(u16), 1, in);
+
+        for (u16 i_coord = 0; i_coord < num_coords; ++i_coord)
+        {
+            u16 x;
+            fread(&x, sizeof(u16), 1, in);
+            fprintf(out, "    - x: %u\n", (unsigned)x);
+
+            u16 y;
+            fread(&y, sizeof(u16), 1, in);
+            fprintf(out, "      y: %u\n", (unsigned)y);
+        }
+
+        u16 u16_01;
+        fread(&u16_01, sizeof(u16), 1, in);
+        fprintf(out, "    u16_01: %u\n", (unsigned)u16_01);
+
+        u16 u16_02;
+        fread(&u16_02, sizeof(u16), 1, in);
+        fprintf(out, "    u16_02: %u\n", (unsigned)u16_02);
+        
+        u8 class_name_present;
+        fread(&class_name_present, sizeof(u8), 1, in);
+
+        if (class_name_present == 0x01)
+        {
+            u16 class_name_len;
+            fread(&class_name_len, sizeof(u16), 1, in);
+            char class_name[FILENAME_MAX];
+            fread(class_name, sizeof(char), class_name_len, in);
+            class_name[class_name_len] = '\0';
+
+            fprintf(out, "    class_name: %s\n", class_name);
+        }
+    }
 }
 
 static void extractSector_SGHT(FILE* in, FILE* out, u32 size)
@@ -704,7 +754,7 @@ int main(int argc, char* argv[])
             break;
         case 0x50524353:
             dumpSector(in, sector_size, "SCRP.dump.bin");
-            out = fopen("SCRP", "wb");
+            out = fopen("SCRP.yaml", "wb");
             extractSector_SCRP(in, out, sector_size);
             fclose(out);
             break;
