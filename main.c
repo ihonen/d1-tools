@@ -195,7 +195,7 @@ static void extractSector_BUIL(FILE* in, FILE* out, u32 size)
             fread(&u8_11, sizeof(u8), 1, in);
             fprintf(out, "        u8_11: %u\n", (unsigned)u8_11);
 
-            fprintf(out, "        frame:\n");
+            fprintf(out, "        outline:\n");
 
             u16 num_frame_coords;
             fread(&num_frame_coords, sizeof(u16), 1, in);
@@ -299,7 +299,7 @@ static void extractSector_BUIL(FILE* in, FILE* out, u32 size)
         fread(&u8_11, sizeof(u8), 1, in);
         fprintf(out, "    u8_11: %u\n", (unsigned)u8_11);
 
-        fprintf(out, "    frame:\n");
+        fprintf(out, "    outline:\n");
 
         u16 num_frame_coords;
         fread(&num_frame_coords, sizeof(u16), 1, in);
@@ -491,10 +491,96 @@ static void extractSector_MASK(FILE* in, FILE* out, u32 size)
 static void extractSector_MAT(FILE* in, FILE* out, u32 size)
 {
     printf("Extracting sector MAT (%uB)\n", (unsigned)size);
-    u8* data = malloc(size);
-    fread(data, 1, size, in);
-    fwrite(data, 1, size, out);
-    free(data);
+
+    fprintf(out, "---\n");
+
+    u32 version;
+    fread(&version, sizeof(u32), 1, in);
+    assert(version == 0x04);
+    fprintf(out, "version: %u\n", (unsigned)version);
+
+    fprintf(out, "sections:\n");
+
+    u16 num_sections;
+    fread(&num_sections, sizeof(u16), 1, in);
+    
+    for (u16 i_section = 0; i_section < num_sections; ++i_section)
+    {
+        u8 u8_01;
+        fread(&u8_01, sizeof(u8), 1, in);
+        fprintf(out, "  - u8_01: %u\n", (unsigned)u8_01);
+
+        u8 u8_02;
+        fread(&u8_02, sizeof(u8), 1, in);
+        fprintf(out, "    u8_02: %u\n", (unsigned)u8_02);
+
+        fprintf(out, "    blocks:\n");
+
+        u16 num_blocks;
+        fread(&num_blocks, sizeof(u16), 1, in);
+
+        for (u16 i_block = 0; i_block < num_blocks; ++i_block)
+        {
+            u8 type;
+            fread(&type, sizeof(u8), 1, in);
+            fprintf(out, "    - type: %u\n", (unsigned)type);
+
+            u16 elevation;
+            fread(&elevation, sizeof(u16), 1, in);
+            fprintf(out, "      elevation: %u\n", (unsigned)elevation);
+
+            if (type != 0x08)
+            {
+                u8 u8_03;
+                fread(&u8_03, sizeof(u8), 1, in);
+                fprintf(out, "      u8_03: %u\n", (unsigned)u8_03);
+
+                u8 u8_04;
+                fread(&u8_04, sizeof(u8), 1, in);
+                fprintf(out, "      u8_04: %u\n", (unsigned)u8_04);
+
+                u8 u8_05;
+                fread(&u8_05, sizeof(u8), 1, in);
+                fprintf(out, "      u8_05: %u\n", (unsigned)u8_05);
+
+                u8 u8_06;
+                fread(&u8_06, sizeof(u8), 1, in);
+                fprintf(out, "      u8_06: %u\n", (unsigned)u8_06);
+
+                u8 u8_07;
+                fread(&u8_07, sizeof(u8), 1, in);
+                fprintf(out, "      u8_07: %u\n", (unsigned)u8_07);
+
+                u8 u8_08;
+                fread(&u8_08, sizeof(u8), 1, in);
+                fprintf(out, "      u8_08: %u\n", (unsigned)u8_08);
+
+                u8 u8_09;
+                fread(&u8_09, sizeof(u8), 1, in);
+                fprintf(out, "      u8_09: %u\n", (unsigned)u8_09);
+
+                u32 u32_01;
+                fread(&u32_01, sizeof(u32), 1, in);
+                fprintf(out, "      u32_01: %u\n", (unsigned)u32_01);
+            }
+
+            fprintf(out, "    - outline:\n");
+
+            u16 num_coords;
+            fread(&num_coords, sizeof(u16), 1, in);
+
+            for (u16 i_coord = 0; i_coord < num_coords; ++i_coord)
+            {
+                u16 x;
+                fread(&x, sizeof(u16), 1, in);
+                fprintf(out, "        - x: %u\n", x);
+
+                u16 y;
+                fread(&y, sizeof(u16), 1, in);
+                fprintf(out, "          y: %u\n", y);
+            }
+        }
+    }
 }
 
 static void extractSector_MISC(FILE* in, FILE* out, u32 size)
@@ -764,7 +850,7 @@ int main(int argc, char* argv[])
             break;
         case 0x2054414D:
             dumpSector(in, sector_size, "MAT.dump.bin");
-            out = fopen("MAT",  "wb");
+            out = fopen("MAT.yaml",  "wb");
             extractSector_MAT (in, out, sector_size);
             fclose(out);
             break;
