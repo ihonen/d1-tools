@@ -175,17 +175,21 @@ static u32 read_u32(FILE* in)
 
 static void dumpSector(FILE* in, u32 size, const char* out_file_name)
 {
-    const long in_pos_orig = ftell(in);
+    const long ftell_orig = ftell(in);
 
     FILE* out = fopen(out_file_name, "wb");
+    assert(out);
 
     u8* data = malloc(size);
+    assert(data);
+    
     fread(data, 1, size, in);
     fwrite(data, 1, size, out);
     free(data);
     fclose(out);
 
-    fseek(in, in_pos_orig, SEEK_SET);
+    fseek(in, ftell_orig, SEEK_SET);
+    assert(ftell(in) == ftell_orig);
 }
 
 static void extractSector_AI(FILE* in, FILE* out, u32 size)
@@ -860,121 +864,121 @@ int main(int argc, char* argv[])
         {
         case DVD_SECTOR_ID_AI:
             dumpSector(in, sector_size, "AI.dump.bin");
-            out = fopen("AI", "wb");
+            assert(out = fopen("AI", "wb"));
             extractSector_AI  (in, out, sector_size);
             fclose(out);
             break;
         case DVD_SECTOR_ID_BGND:
             dumpSector(in, sector_size, "BGND.dump.bin");
-            out = fopen("BGND.ppm", "wb");
+            assert(out = fopen("BGND.ppm", "wb"));
             extractSector_BGND(in, out, sector_size);
             fclose(out);
             break;
         case DVD_SECTOR_ID_BOND:
             dumpSector(in, sector_size, "BOND.dump.bin");
-            out = fopen("BOND.yaml", "wb");
+            assert(out = fopen("BOND.yaml", "wb"));
             extractSector_BOND(in, out, sector_size);
             fclose(out);
             break;
         case DVD_SECTOR_ID_BUIL:
             dumpSector(in, sector_size, "BUIL.dump.bin");
-            out = fopen("BUIL.yaml", "wb");
+            assert(out = fopen("BUIL.yaml", "wb"));
             extractSector_BUIL(in, out, sector_size);
             fclose(out);
             break;
         case DVD_SECTOR_ID_CART:
             dumpSector(in, sector_size, "CART.dump.bin");
-            out = fopen("CART", "wb");
+            assert(out = fopen("CART", "wb"));
             extractSector_CART(in, out, sector_size);
             fclose(out);
             break;
         case DVD_SECTOR_ID_DLGS:
             dumpSector(in, sector_size, "DLGS.dump.bin");
-            out = fopen("DLGS", "wb");
+            assert(out = fopen("DLGS", "wb"));
             extractSector_DLGS(in, out, sector_size);
             fclose(out);
             break;
         case DVD_SECTOR_ID_ELEM:
             dumpSector(in, sector_size, "ELEM.dump.bin");
-            out = fopen("ELEM", "wb");
+            assert(out = fopen("ELEM", "wb"));
             extractSector_ELEM(in, out, sector_size);
             fclose(out);
             break;
         case DVD_SECTOR_ID_FXBK:
             dumpSector(in, sector_size, "FXBK.dump.bin");
-            out = fopen("FXBK.yaml", "wb");
+            assert(out = fopen("FXBK.yaml", "wb"));
             extractSector_FXBK(in, out, sector_size);
             fclose(out);
             break;
         case DVD_SECTOR_ID_JUMP:
             dumpSector(in, sector_size, "JUMP.dump.bin");
-            out = fopen("JUMP", "wb");
+            assert(out = fopen("JUMP", "wb"));
             extractSector_JUMP(in, out, sector_size);
             fclose(out);
             break;
         case DVD_SECTOR_ID_LIFT:
             dumpSector(in, sector_size, "LIFT.dump.bin");
-            out = fopen("LIFT", "wb");
+            assert(out = fopen("LIFT", "wb"));
             extractSector_LIFT(in, out, sector_size);
             fclose(out);
             break;
         case DVD_SECTOR_ID_MASK:
             dumpSector(in, sector_size, "MASK.dump.bin");
-            out = fopen("MASK", "wb");
+            assert(out = fopen("MASK", "wb"));
             extractSector_MASK(in, out, sector_size);
             fclose(out);
             break;
         case DVD_SECTOR_ID_MAT:
             dumpSector(in, sector_size, "MAT.dump.bin");
-            out = fopen("MAT.yaml",  "wb");
+            assert(out = fopen("MAT.yaml",  "wb"));
             extractSector_MAT (in, out, sector_size);
             fclose(out);
             break;
         case DVD_SECTOR_ID_MISC:
             dumpSector(in, sector_size, "MISC.dump.bin");
-            out = fopen("MISC", "wb");
+            assert(out = fopen("MISC", "wb"));
             extractSector_MISC(in, out, sector_size);
             fclose(out);
             break;
         case DVD_SECTOR_ID_MOVE:
             dumpSector(in, sector_size, "MOVE.dump.bin");
-            out = fopen("MOVE", "wb");
+            assert(out = fopen("MOVE", "wb"));
             extractSector_MOVE(in, out, sector_size);
             fclose(out);
             break;
         case DVD_SECTOR_ID_MSIC:
             dumpSector(in, sector_size, "MSIC.dump.bin");
-            out = fopen("MSIC.yaml", "wb");
+            assert(out = fopen("MSIC.yaml", "wb"));
             extractSector_MSIC(in, out, sector_size);
             fclose(out);
             break;
         case DVD_SECTOR_ID_PAT:
             dumpSector(in, sector_size, "PAT.dump.bin");
-            out = fopen("PAT",  "wb");
+            assert(out = fopen("PAT",  "wb"));
             extractSector_PAT (in, out, sector_size);
             fclose(out);
             break;
         case DVD_SECTOR_ID_SCRP:
             dumpSector(in, sector_size, "SCRP.dump.bin");
-            out = fopen("SCRP.yaml", "wb");
+            assert(out = fopen("SCRP.yaml", "wb"));
             extractSector_SCRP(in, out, sector_size);
             fclose(out);
             break;
         case DVD_SECTOR_ID_SGHT:
             dumpSector(in, sector_size, "SGHT.dump.bin");
-            out = fopen("SGHT", "wb");
+            assert(out = fopen("SGHT", "wb"));
             extractSector_SGHT(in, out, sector_size);
             fclose(out);
             break;
         case DVD_SECTOR_ID_SND:
             dumpSector(in, sector_size, "SND.dump.bin");
-            out = fopen("SND",  "wb");
+            assert(out = fopen("SND",  "wb"));
             extractSector_SND (in, out, sector_size);
             fclose(out);
             break;
         case DVD_SECTOR_ID_WAYS:
             dumpSector(in, sector_size, "WAYS.dump.bin");
-            out = fopen("WAYS", "wb");
+            assert(out = fopen("WAYS", "wb"));
             extractSector_WAYS(in, out, sector_size);
             fclose(out);
             break;
