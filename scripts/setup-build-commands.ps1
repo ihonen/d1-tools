@@ -4,7 +4,7 @@
 
 function Configure
 {
-    cmake -B "$BUILD_DIR" -S "$SRC_DIR"
+    cmake -B "$BUILD_DIR" -S "$SRC_DIR" -DCMAKE_TOOLCHAIN_FILE="$PROJECT_DIR"/extern/vcpkg/scripts/buildsystems/vcpkg.cmake
 }
 
 function Build-Debug

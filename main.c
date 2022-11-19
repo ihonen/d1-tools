@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include <bzlib.h>
+
 // -----------------------------------------------------------------------------
 // FUNCTION MACROS
 // -----------------------------------------------------------------------------
@@ -22,6 +24,22 @@ typedef  uint8_t  u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
 typedef uint64_t u64;
+
+#pragma pack(push, 1)
+typedef struct
+{
+    u16 b: 5;
+    u16 g: 6;
+    u16 r: 5;
+} Bgr565;
+
+typedef struct
+{
+    u8 b;
+    u8 g;
+    u8 r;
+} Bgr888;
+#pragma pack(pop)
 
 // -----------------------------------------------------------------------------
 // CONSTANTS
@@ -47,6 +65,66 @@ typedef uint64_t u64;
 #define DVD_SECTOR_ID_SGHT UINT32_C(0x54484753)
 #define DVD_SECTOR_ID_SND  UINT32_C(0x20444E53)
 #define DVD_SECTOR_ID_WAYS UINT32_C(0x53594157)
+
+// -----------------------------------------------------------------------------
+// IMAGE HANDLING
+// -----------------------------------------------------------------------------
+
+static void bgr565_to_bgr888(const Bgr565* src, Bgr888* dest, size_t num_pixels)
+{
+    const Bgr565 const* src_end  = src  + num_pixels;
+    const Bgr888 const* dest_end = dest + num_pixels;
+
+    for (; src < src_end; ++src, ++dest)
+    {
+        dest->b = (src->b * 527 + 23) >> 6;
+        dest->g = (src->g * 259 + 33) >> 6;
+        dest->r = (src->r * 527 + 23) >> 6;
+    }
+
+    assert(src == src_end);
+    assert(dest == dest_end);
+}
+
+static void bgr888_to_bgr565(const Bgr888* src, Bgr565* dest, size_t num_pixels)
+{
+    const Bgr888 const* src_end  = src  + num_pixels;
+    const Bgr565 const* dest_end = dest + num_pixels;
+
+    for (; src < src_end; ++src, ++dest)
+    {
+        dest->b = (src->b * 249 + 1014 ) >> 11;
+        dest->g = (src->g * 253 +  505 ) >> 10;
+        dest->r = (src->r * 249 + 1014 ) >> 11;
+    }
+
+    assert(src == src_end);
+    assert(dest == dest_end);
+}
+
+static void bgr888_to_ppm(const Bgr888* src, size_t width, size_t height, FILE* out)
+{
+    // ASCII:
+    // fprintf(out, "P3\n");
+    // Binary:
+    fprintf(out, "P6\n");
+    fprintf(out, "%u, %u\n", (unsigned)width, (unsigned)height);
+    fprintf(out, "255\n");
+
+    for (size_t y = 0; y < height; ++y)
+    {
+        for (size_t x = 0; x < width; ++x)
+        {
+            size_t offset = y * width + x;
+            // ASCII:
+            // fprintf(out, "% 3u % 3u % 3u\n", src[offset].r, src[offset].g, src[offset].b);
+            // Binary:
+            fwrite(&src[offset].r, sizeof(u8), 1, out);
+            fwrite(&src[offset].g, sizeof(u8), 1, out);
+            fwrite(&src[offset].b, sizeof(u8), 1, out);
+        }
+    }
+}
 
 // -----------------------------------------------------------------------------
 // FILE HANDLING
@@ -122,10 +200,55 @@ static void extractSector_AI(FILE* in, FILE* out, u32 size)
 static void extractSector_BGND(FILE* in, FILE* out, u32 size)
 {
     printf("INFO: Extracting sector BGND (%u bytes)\n", (unsigned)size);
-    u8* data = malloc(size);
-    fread(data, 1, size, in);
-    fwrite(data, 1, size, out);
-    free(data);
+
+    u32 version = read_u32(in);
+    assert(version == 0x04);
+
+    u16 filename_len = read_u16(in);
+
+    char filename[FILENAME_MAX];
+    fread(filename, sizeof(char), filename_len, in);
+    filename[filename_len] = '\0';
+
+    u16 width = read_u16(in);
+
+    u16 height = read_u16(in);
+
+    u32 compr_algo = read_u32(in);
+    assert(compr_algo == 0x02);
+
+    u32 compr_data_len = read_u32(in);
+
+    u8* compr_data = malloc(compr_data_len);
+    assert(compr_data);
+    fread(compr_data, sizeof(u8), compr_data_len, in);
+
+    u32 decompr_data_len = width * height * 2; // RGB565
+
+    u8* decompr_data = malloc(decompr_data_len);
+    assert(decompr_data);
+
+    assert(BZ2_bzBuffToBuffDecompress(
+        (char*)decompr_data,
+        &decompr_data_len,
+        (char*)compr_data,
+        compr_data_len,
+        0,
+        0
+    ) == BZ_OK);
+
+    assert(decompr_data_len == width * height * 2);
+
+    u32 rgb888_data_len = width * height * 3; // RGB888
+
+    u8* rgb888_data = malloc(rgb888_data_len);
+
+    bgr565_to_bgr888(decompr_data, rgb888_data, width * height);
+    bgr888_to_ppm(rgb888_data, width, height, out);
+
+    free(compr_data);
+    free(decompr_data);
+    free(rgb888_data);
 }
 
 static void extractSector_BOND(FILE* in, FILE* out, u32 size)
@@ -710,13 +833,18 @@ int main(int argc, char* argv[])
     if (argc < 2)
     {
         printf("USAGE: %s <DVD file>\n", argv[0]);
-        exit(EXIT_FAILURE);
+        return EXIT_FAILURE;
     }
 
     size_t in_size = getFileSize(argv[1]);
     FILE* in       = fopen(argv[1], "rb");
+    if (!in)
+    {
+        printf("ERROR: Failed to open file '%s'\n", argv[1]);
+        return EXIT_FAILURE;
+    }
 
-    printf("INFO: Extracting file '%s' (%u bytes)\n", argv[1], in_size);
+    printf("INFO: Extracting file '%s' (%u bytes)\n", argv[1], (unsigned)in_size);
 
     FILE* out = NULL;
 
@@ -738,7 +866,7 @@ int main(int argc, char* argv[])
             break;
         case DVD_SECTOR_ID_BGND:
             dumpSector(in, sector_size, "BGND.dump.bin");
-            out = fopen("BGND", "wb");
+            out = fopen("BGND.ppm", "wb");
             extractSector_BGND(in, out, sector_size);
             fclose(out);
             break;

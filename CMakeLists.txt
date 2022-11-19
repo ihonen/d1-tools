@@ -13,6 +13,15 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 # ------------------------------------------------------------------------------
 
+# Installed by vcpkg.
+find_package(BZip2 REQUIRED)
+
+# ------------------------------------------------------------------------------
+
 add_executable(dvd-extractor
     main.c
+)
+
+target_link_libraries(dvd-extractor
+    PRIVATE BZip2::BZip2
 )
