@@ -566,16 +566,16 @@ static void extractSector_MSIC(FILE* in, FILE* out, u32 size)
 {
     printf("INFO: Extracting sector MSIC (%u bytes)\n", (unsigned)size);
 
+    fprintf(out, "---\n");
+
     u32 version = read_u32(in);
     assert(version == 0x01);
+    fprintf(out, "version: %u\n", (unsigned)version);
 
-    fprintf(out, "---\n");
-    fprintf(out, "green:\n");
+    fprintf(out, "green_tracks:\n");
 
-    u16 num_green;
-    fread(&num_green, sizeof(u16), 1, in);
-    
-    for (u16 g = 0; g < num_green; ++g)
+    u16 num_green = read_u16(in);
+    for (u16 i_green = 0; i_green < num_green; ++i_green)
     {
         u16 filename_len;
         fread(&filename_len, sizeof(u16), 1, in);
@@ -587,12 +587,10 @@ static void extractSector_MSIC(FILE* in, FILE* out, u32 size)
         fprintf(out, "  - %s\n", filename);
     }
 
-    fprintf(out, "orange:\n");
+    fprintf(out, "orange_tracks:\n");
 
-    u16 num_orange;
-    fread(&num_orange, sizeof(u16), 1, in);
-
-    for (u16 o = 0; o < num_orange; ++o)
+    u16 num_orange = read_u16(in);
+    for (u16 i_orange = 0; i_orange < num_orange; ++i_orange)
     {
         u16 filename_len;
         fread(&filename_len, sizeof(u16), 1, in);
@@ -604,12 +602,10 @@ static void extractSector_MSIC(FILE* in, FILE* out, u32 size)
         fprintf(out, "  - %s\n", filename);
     }
 
-    fprintf(out, "red:\n");
+    fprintf(out, "red_tracks:\n");
 
-    u16 num_red;
-    fread(&num_red, sizeof(u16), 1, in);
-    
-    for (u16 r = 0; r < num_red; ++r)
+    u16 num_red = read_u16(in);
+    for (u16 i_red = 0; i_red < num_red; ++i_red)
     {
         u16 filename_len;
         fread(&filename_len, sizeof(u16), 1, in);
