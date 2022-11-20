@@ -170,7 +170,7 @@ static u32 read_u32(FILE* in)
 }
 
 // -----------------------------------------------------------------------------
-// SECTOR EXTRACTION
+// SECTOR DUMPING
 // -----------------------------------------------------------------------------
 
 static void dumpSector(FILE* in, u32 size, const char* out_file_name)
@@ -182,7 +182,7 @@ static void dumpSector(FILE* in, u32 size, const char* out_file_name)
 
     u8* data = malloc(size);
     assert(data);
-    
+
     fread(data, 1, size, in);
     fwrite(data, 1, size, out);
     free(data);
@@ -191,6 +191,10 @@ static void dumpSector(FILE* in, u32 size, const char* out_file_name)
     fseek(in, ftell_orig, SEEK_SET);
     assert(ftell(in) == ftell_orig);
 }
+
+// -----------------------------------------------------------------------------
+// SECTOR EXTRACTION
+// -----------------------------------------------------------------------------
 
 static void extractSector_AI(FILE* in, FILE* out, u32 size)
 {
@@ -214,8 +218,7 @@ static void extractSector_BGND(FILE* in, FILE* out, u32 size)
     fread(filename, sizeof(char), filename_len, in);
     filename[filename_len] = '\0';
 
-    u16 width = read_u16(in);
-
+    u16 width  = read_u16(in);
     u16 height = read_u16(in);
 
     u32 compr_algo = read_u32(in);
@@ -253,6 +256,10 @@ static void extractSector_BGND(FILE* in, FILE* out, u32 size)
     free(compr_data);
     free(decompr_data);
     free(rgb888_data);
+
+    printf("  --> Dimensions: %u x %u\n", (unsigned)width, (unsigned)height);
+    printf("  --> Pixel format: BGR565\n");
+    printf("  --> Compression: bz2\n");
 }
 
 static void extractSector_BOND(FILE* in, FILE* out, u32 size)
@@ -268,7 +275,6 @@ static void extractSector_BOND(FILE* in, FILE* out, u32 size)
     fprintf(out, "entries:\n");
 
     u16 num_entries = read_u16(in);
-
     for (u16 i_entry = 0; i_entry < num_entries; ++i_entry)
     {
         u16 x1 = read_u16(in);
@@ -292,6 +298,8 @@ static void extractSector_BOND(FILE* in, FILE* out, u32 size)
         u16 u16_03 = read_u16(in);
         fprintf(out, "    u16_03: %u\n", (unsigned)u16_03);
     }
+
+    printf("  --> %u entries\n", (unsigned)num_entries);
 }
 
 static void extractSector_BUIL(FILE* in, FILE* out, u32 size)
@@ -482,6 +490,9 @@ static void extractSector_BUIL(FILE* in, FILE* out, u32 size)
             fprintf(out, "    - u8_02: %u\n", (unsigned)u8_04);
         }
     }
+
+    printf("  --> %u building entries\n", (unsigned)num_buildings);
+    printf("  --> %u special door entries\n", (unsigned)num_special_doors);
 }
 
 static void extractSector_CART(FILE* in, FILE* out, u32 size)
@@ -566,6 +577,12 @@ static void extractSector_FXBK(FILE* in, FILE* out, u32 size)
         u16 xpt_id = read_u16(in);
         fprintf(out, "  - %u\n", (unsigned)xpt_id);
     }
+
+    printf("  --> %u effect entries\n", (unsigned)num_effects);
+    printf("  --> %u sound entries\n", (unsigned)num_sounds);
+    printf("  --> %u .xet entries\n", (unsigned)num_xet);
+    printf("  --> %u .xct entries\n", (unsigned)num_xct);
+    printf("  --> %u .xpt entries\n", (unsigned)num_xpt);
 }
 
 static void extractSector_JUMP(FILE* in, FILE* out, u32 size)
@@ -607,7 +624,7 @@ static void extractSector_MAT(FILE* in, FILE* out, u32 size)
 
     fprintf(out, "sections:\n");
 
-    u16 num_sections = read_u16(in);    
+    u16 num_sections = read_u16(in);
     for (u16 i_section = 0; i_section < num_sections; ++i_section)
     {
         u8 u8_01 = read_u8(in);
@@ -669,6 +686,8 @@ static void extractSector_MAT(FILE* in, FILE* out, u32 size)
             }
         }
     }
+
+    printf("  --> %u sections\n", (unsigned)num_sections);
 }
 
 static void extractSector_MISC(FILE* in, FILE* out, u32 size)
@@ -743,6 +762,10 @@ static void extractSector_MSIC(FILE* in, FILE* out, u32 size)
 
         fprintf(out, "  - %s\n", filename);
     }
+
+    printf("  --> %u green .wav entries\n", (unsigned)num_green);
+    printf("  --> %u orange .wav entries\n", (unsigned)num_orange);
+    printf("  --> %u red .wav entries\n", (unsigned)num_red);
 }
 
 static void extractSector_PAT(FILE* in, FILE* out, u32 size)
