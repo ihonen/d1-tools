@@ -511,6 +511,99 @@ static void extractSector_DLGS(FILE* in, FILE* out, u32 size)
     fread(data, 1, size, in);
     fwrite(data, 1, size, out);
     free(data);
+
+    // FIXME: The below isn't quite right.
+    /*
+    long ftell_orig = ftell(in);
+
+    printf("INFO: Extracting sector DLGS (%u bytes)\n", (unsigned)size);
+
+    fprintf(out, "---\n");
+
+    u32 version = read_u32(in);
+    assert(version == 0x04);
+    fprintf(out, "version: %u\n", (unsigned)version);
+
+    u32 index_text = read_u32(in);
+    fprintf(out, "index_text: %u\n", (unsigned)index_text);
+    printf("  --> text index: %u\n", (index_text));
+
+    u32 index_wave = read_u32(in);
+    fprintf(out, "index_wave: %u\n", (unsigned)index_wave);
+    printf("  --> wave index: %u\n", (index_wave));
+
+    fprintf(out, "unknown_entries:\n");
+
+    u32 num_unknown_entries = read_u32(in);
+    for (u32 i_unknown_entry = 0; i_unknown_entry < num_unknown_entries; ++i_unknown_entry)
+    {
+        u32 unk_32_00 = read_u32(in);
+        fprintf(out, "  - unk_32_00: %u\n", (unsigned)unk_32_00);
+
+        u32 unk_32_01 = read_u32(in);
+        fprintf(out, "    unk_32_01: %u\n", (unsigned)unk_32_01);
+
+        u32 unk_32_02 = read_u32(in);
+        fprintf(out, "    unk_32_02: %u\n", (unsigned)unk_32_02);
+    }
+
+    fprintf(out, "tricks:\n");
+    uint32_t index_tricks = read_u32(in);
+    fprintf(out, "  - index: %u\n", index_tricks);
+
+    fprintf(out, "    ids:\n");
+
+    uint32_t num_tricks = read_u32(in);
+    for (u32 i_trick = 0; i_trick < num_tricks; ++i_trick)
+    {
+        u32 trick_id = read_u32(in);
+        fprintf(out, "     - %u\n", (unsigned)trick_id);
+    }
+
+    fprintf(out, "objectives:\n");
+    printf("ASD\n");
+    uint32_t index_objectives = read_u32(in);
+    fprintf(out, "  - index: %u\n", index_objectives);
+
+    fprintf(out, "    ids:\n");
+
+    uint32_t num_objectives = read_u32(in);
+    for (u32 i_objective = 0; i_objective < num_objectives; ++i_objective)
+    {
+        u32 objective_id = read_u32(in);
+        fprintf(out, "     - %u\n", (unsigned)objective_id);
+    }
+
+    fprintf(out, "debriefing:\n");
+    uint32_t index_debriefing = read_u32(in);
+    fprintf(out, "  - index: %u\n", index_debriefing);
+
+    fprintf(out, "    ids_1:\n");
+
+    uint32_t num_debriefings1 = read_u32(in);
+    for (u32 i_debriefing1 = 0; i_debriefing1 < num_debriefings1; ++i_debriefing1)
+    {
+        u32 debriefing_id1 = read_u32(in);
+        fprintf(out, "     - %u\n", (unsigned)debriefing_id1);
+    }
+
+    fprintf(out, "    ids_2:\n");
+
+    uint32_t num_debriefings2 = read_u32(in);
+    for (u32 i_debriefing2 = 0; i_debriefing2 < num_debriefings2; ++i_debriefing2)
+    {
+        u32 debriefing_id2 = read_u32(in);
+        fprintf(out, "     - %u\n", (unsigned)debriefing_id2);
+    }
+
+    u32 bytes_left = size - (ftell(in) - ftell_orig);
+    printf("bytes_left = %u\n", (unsigned)bytes_left);
+    for (u32 i_byte = 0; i_byte < bytes_left; ++i_byte)
+    {
+        u8 byte;
+        fread(&byte, 1, 1, in);
+    }
+    */
 }
 
 static void extractSector_ELEM(FILE* in, FILE* out, u32 size)
