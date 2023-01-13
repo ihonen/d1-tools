@@ -1,6 +1,17 @@
-. "$PSScriptRoot\env.ps1"
+. "$PSScriptRoot\Environment.ps1"
 
-# ------------------------------------------------------------------------------
+################################################################################
+# SETUP VCPKG
+################################################################################
+
+Set-Variable -Name VCPKG_DIR -Value "$(Join-Path "$PSScriptRoot" "..\extern\vcpkg" -Resolve)"
+
+& "$VCPKG_DIR\bootstrap-vcpkg.bat"
+& "$VCPKG_DIR\vcpkg.exe" install bzip2:x64-windows
+
+################################################################################
+# BUILD COMMANDS
+################################################################################
 
 function Configure
 {
