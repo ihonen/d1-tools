@@ -72,8 +72,8 @@ typedef struct
 
 static void bgr565_to_bgr888(const Bgr565* src, Bgr888* dest, size_t num_pixels)
 {
-    const Bgr565 const* src_end  = src  + num_pixels;
-    const Bgr888 const* dest_end = dest + num_pixels;
+    const Bgr565* const src_end  = src  + num_pixels;
+    const Bgr888* const dest_end = dest + num_pixels;
 
     for (; src < src_end; ++src, ++dest)
     {
@@ -88,8 +88,8 @@ static void bgr565_to_bgr888(const Bgr565* src, Bgr888* dest, size_t num_pixels)
 
 static void bgr888_to_bgr565(const Bgr888* src, Bgr565* dest, size_t num_pixels)
 {
-    const Bgr888 const* src_end  = src  + num_pixels;
-    const Bgr565 const* dest_end = dest + num_pixels;
+    const Bgr888* const src_end  = src  + num_pixels;
+    const Bgr565* const dest_end = dest + num_pixels;
 
     for (; src < src_end; ++src, ++dest)
     {
@@ -250,8 +250,8 @@ static void extractSector_BGND(FILE* in, FILE* out, u32 size)
 
     u8* rgb888_data = malloc(rgb888_data_len);
 
-    bgr565_to_bgr888(decompr_data, rgb888_data, width * height);
-    bgr888_to_ppm(rgb888_data, width, height, out);
+    bgr565_to_bgr888((const Bgr565*)decompr_data, (Bgr888*)rgb888_data, width * height);
+    bgr888_to_ppm((Bgr888*)rgb888_data, width, height, out);
 
     free(compr_data);
     free(decompr_data);
@@ -638,7 +638,7 @@ static void extractSector_FXBK(FILE* in, FILE* out, u32 size)
     fprintf(out, "sounds:\n");
 
     u32 num_sounds = read_u32(in);
-    for (int i_sound = 0; i_sound < num_sounds; ++i_sound)
+    for (u32 i_sound = 0; i_sound < num_sounds; ++i_sound)
     {
         u32 sound_id = read_u32(in);
         fprintf(out, "  - %u\n", (unsigned)sound_id);
