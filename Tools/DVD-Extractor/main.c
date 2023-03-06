@@ -1,3 +1,14 @@
+// ---------------------------------------------------------
+// INCLUDES
+// ---------------------------------------------------------
+
+#include "Core/File/dvd.h"
+#include "Core/Image/rgb.h"
+#include "Core/Util/compression.h"
+#include "Core/Util/fs.h"
+#include "Core/Util/s11n.h"
+#include "Core/Util/typedef.h"
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,164 +21,6 @@
 // ---------------------------------------------------------
 
 #define PRINT_ERROR(f, ...) fprintf(stderr, "ERROR: " f "\n", ...)
-
-// ---------------------------------------------------------
-// TYPEDEFS
-// ---------------------------------------------------------
-
-typedef  int8_t  i8;
-typedef int16_t i16;
-typedef int32_t i32;
-typedef int64_t i64;
-
-typedef  uint8_t  u8;
-typedef uint16_t u16;
-typedef uint32_t u32;
-typedef uint64_t u64;
-
-#pragma pack(push, 1)
-typedef struct
-{
-    u16 b: 5;
-    u16 g: 6;
-    u16 r: 5;
-} Bgr565;
-
-typedef struct
-{
-    u8 b;
-    u8 g;
-    u8 r;
-} Bgr888;
-#pragma pack(pop)
-
-// ---------------------------------------------------------
-// CONSTANTS
-// ---------------------------------------------------------
-
-#define DVD_SECTOR_ID_AI   UINT32_C(0x20204941)
-#define DVD_SECTOR_ID_BGND UINT32_C(0x444E4742)
-#define DVD_SECTOR_ID_BOND UINT32_C(0x444E4F42)
-#define DVD_SECTOR_ID_BUIL UINT32_C(0x4C495542)
-#define DVD_SECTOR_ID_CART UINT32_C(0x54524143)
-#define DVD_SECTOR_ID_DLGS UINT32_C(0x53474C44)
-#define DVD_SECTOR_ID_ELEM UINT32_C(0x4D454C45)
-#define DVD_SECTOR_ID_FXBK UINT32_C(0x4B425846)
-#define DVD_SECTOR_ID_JUMP UINT32_C(0x504D554A)
-#define DVD_SECTOR_ID_LIFT UINT32_C(0x5446494C)
-#define DVD_SECTOR_ID_MASK UINT32_C(0x4B53414D)
-#define DVD_SECTOR_ID_MAT  UINT32_C(0x2054414D)
-#define DVD_SECTOR_ID_MISC UINT32_C(0x4353494D)
-#define DVD_SECTOR_ID_MOVE UINT32_C(0x45564F4D)
-#define DVD_SECTOR_ID_MSIC UINT32_C(0x4349534D)
-#define DVD_SECTOR_ID_PAT  UINT32_C(0x20544150)
-#define DVD_SECTOR_ID_SCRP UINT32_C(0x50524353)
-#define DVD_SECTOR_ID_SGHT UINT32_C(0x54484753)
-#define DVD_SECTOR_ID_SND  UINT32_C(0x20444E53)
-#define DVD_SECTOR_ID_WAYS UINT32_C(0x53594157)
-
-// ---------------------------------------------------------
-// IMAGE HANDLING
-// ---------------------------------------------------------
-
-static void bgr565_to_bgr888(const Bgr565* src, Bgr888* dest, size_t num_pixels)
-{
-    const Bgr565* const src_end  = src  + num_pixels;
-    const Bgr888* const dest_end = dest + num_pixels;
-
-    for (; src < src_end; ++src, ++dest)
-    {
-        dest->b = (src->b * 527 + 23) >> 6;
-        dest->g = (src->g * 259 + 33) >> 6;
-        dest->r = (src->r * 527 + 23) >> 6;
-    }
-
-    assert(src == src_end);
-    assert(dest == dest_end);
-}
-
-static void bgr888_to_bgr565(const Bgr888* src, Bgr565* dest, size_t num_pixels)
-{
-    const Bgr888* const src_end  = src  + num_pixels;
-    const Bgr565* const dest_end = dest + num_pixels;
-
-    for (; src < src_end; ++src, ++dest)
-    {
-        dest->b = (src->b * 249 + 1014 ) >> 11;
-        dest->g = (src->g * 253 +  505 ) >> 10;
-        dest->r = (src->r * 249 + 1014 ) >> 11;
-    }
-
-    assert(src == src_end);
-    assert(dest == dest_end);
-}
-
-static void bgr888_to_ppm(const Bgr888* src, size_t width, size_t height, FILE* out)
-{
-    // ASCII:
-    // fprintf(out, "P3\n");
-    // Binary:
-    fprintf(out, "P6\n");
-    fprintf(out, "%u, %u\n", (unsigned)width, (unsigned)height);
-    fprintf(out, "255\n");
-
-    for (size_t y = 0; y < height; ++y)
-    {
-        for (size_t x = 0; x < width; ++x)
-        {
-            size_t offset = y * width + x;
-            // ASCII:
-            // fprintf(out, "% 3u % 3u % 3u\n", src[offset].r, src[offset].g, src[offset].b);
-            // Binary:
-            fwrite(&src[offset].r, sizeof(u8), 1, out);
-            fwrite(&src[offset].g, sizeof(u8), 1, out);
-            fwrite(&src[offset].b, sizeof(u8), 1, out);
-        }
-    }
-}
-
-// ---------------------------------------------------------
-// FILE HANDLING
-// ---------------------------------------------------------
-
-static size_t getFileSize(const char* path)
-{
-    FILE* tmp = fopen(path, "r");
-    if (tmp)
-    {
-        fseek(tmp, 0, SEEK_END);
-        size_t size = ftell(tmp);
-        fclose(tmp);
-        return size;
-    }
-
-    return 0;
-}
-
-// ---------------------------------------------------------
-// DESERIALIZATION
-// ---------------------------------------------------------
-
-static u8 read_u8(FILE* in)
-{
-    u8 value = 0;
-    assert(fread(&value, sizeof(u8), 1, in) == 1);
-    return value;
-}
-
-static u16 read_u16(FILE* in)
-{
-    u16 value = 0;
-    assert(fread(&value, sizeof(u16), 1, in) == 1);
-    return value;
-}
-
-static u32 read_u32(FILE* in)
-{
-    u32 value = 0;
-    assert(fread(&value, sizeof(u32), 1, in) == 1);
-    return value;
-}
 
 // ---------------------------------------------------------
 // SECTOR DUMPING
@@ -222,7 +75,7 @@ static void extractSector_BGND(FILE* in, FILE* out, u32 size)
     u16 height = read_u16(in);
 
     u32 compr_algo = read_u32(in);
-    assert(compr_algo == 0x02);
+    assert(compr_algo == COMPRESSION_BZ2);
 
     u32 compr_data_len = read_u32(in);
 

@@ -22,5 +22,6 @@ else ()
 endif ()
 
 target_link_libraries(dvd-extractor
+    PRIVATE Core
     PRIVATE BZip2::BZip2
 )
